@@ -1,0 +1,44 @@
+[
+	{
+		"templateName": "svc.btl",
+		"targetDir": "../rep-api/src/main/java/${modulePath}/svc/",
+		"targetFile": "${entityName}Svc.java",
+		"isGenTargetOnMiddleTable": false,
+		"backup": false
+	},
+	{
+		"templateName": "svc-impl.btl",
+		"targetDir": "../rep-bll/src/main/java/${modulePath}/svc/impl/",
+		"targetFile": "${entityName}SvcImpl.java",
+		"isGenTargetOnMiddleTable": false,
+		"backup": false
+	},
+	{
+		"templateName": "ctrl.btl",
+		"targetDir": "../rep-svr/src/main/java/${modulePath}/ctrl/",
+		"targetFile": "${entityName}Ctrl.java",
+		"isGenTargetOnMiddleTable": false,
+		"backup": false
+	},
+	{
+		"templateName": "test.btl",
+		"targetDir": "../rep-svr/src/test/java/${modulePath}/test/",
+		"targetFile": "${entityName}Tests.java",
+		"isGenTargetOnMiddleTable": false,
+		"backup": false
+	},
+	{
+		"templateName": "dao.btl",
+		"targetDir": "../rep-bll/src/main/java/${modulePath}/dao/",
+		"targetFile": "${entityName}Dao.java",
+		"isGenTargetOnMiddleTable": false,
+		"backup": false
+	},
+	{
+		"templateName": "jo.btl",
+		"targetDir": "../rep-api/src/main/java/${modulePath}/jo/",
+		"targetFile": "${entityName}Jo.java",
+		"isGenTargetOnMiddleTable": false,
+		"backup": false
+	}
+]

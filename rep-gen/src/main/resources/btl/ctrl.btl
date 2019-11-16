@@ -1,0 +1,212 @@
+package ${modulePackage}.ctrl;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.github.pagehelper.PageInfo;
+
+import lombok.extern.slf4j.Slf4j;
+import ${moClassFullName};
+import ${modulePackage}.svc.${entityName}Svc;
+
+import rebue.robotech.dic.ResultDic;
+import rebue.robotech.ro.IdRo;
+import rebue.robotech.ro.Ro;
+
+/**
+ * ${table.remarks}
+ *
+ * @mbg.generated 自动生成的注释，如需修改本注释，请删除本行
+ */
+@RestController
+@Slf4j
+public class ${entityName}Ctrl {
+    /**
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @Resource
+    private ${entityName}Svc svc;
+
+    /**
+     * 添加${entityTitle}
+     *
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @PostMapping("/${strutil.toLowerCase(entityNamePrefix)}/${kebab(sputil.uncapitalize(entitySimpleName))}")
+    IdRo add(@RequestBody final ${moClassShortName} mo) throws Exception {
+        log.info("received post:/${strutil.toLowerCase(entityNamePrefix)}/${kebab(sputil.uncapitalize(entitySimpleName))}");
+        log.info("${sputil.uncapitalize(entitySimpleName)}Ctrl.add: {}", mo);
+        final IdRo ro = new IdRo();
+        try {
+            final int result = svc.add(mo);
+            if (result == 1) {
+                final String msg = "添加成功";
+                log.info("{}: mo-{}", msg, mo);
+                ro.setMsg(msg);
+                ro.setResult(ResultDic.SUCCESS);
+                ro.setId(mo.getId().toString());
+                return ro;
+            } else {
+                final String msg = "添加失败";
+                log.error("{}: mo-{}", msg, mo);
+                ro.setMsg(msg);
+                ro.setResult(ResultDic.FAIL);
+                return ro;
+            }
+        } catch (final DuplicateKeyException e) {
+            final String msg = "添加失败，唯一键重复：" + e.getCause().getMessage();
+            log.error(msg + ": mo-" + mo, e);
+            ro.setMsg(msg);
+            ro.setResult(ResultDic.FAIL);
+            return ro;
+        } catch (final RuntimeException e) {
+            final String msg = "添加失败，出现运行时异常";
+            log.error(msg + ": mo-" + mo, e);
+            ro.setMsg(msg);
+            ro.setResult(ResultDic.FAIL);
+            return ro;
+        }
+    }
+
+    /**
+     * 修改${entityTitle}
+     *
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @PutMapping("/${strutil.toLowerCase(entityNamePrefix)}/${kebab(sputil.uncapitalize(entitySimpleName))}")
+    Ro modify(@RequestBody final ${moClassShortName} mo) throws Exception {
+        log.info("received put:/${strutil.toLowerCase(entityNamePrefix)}/${kebab(sputil.uncapitalize(entitySimpleName))}");
+        log.info("${sputil.uncapitalize(entitySimpleName)}Ctrl.modify: {}", mo);
+        try {
+            if (svc.modify(mo) == 1) {
+                final String msg = "修改成功";
+                log.info("{}: mo-{}", msg, mo);
+                return new Ro(ResultDic.SUCCESS, msg);
+            } else {
+                final String msg = "修改失败";
+                log.error("{}: mo-{}", msg, mo);
+                return new Ro(ResultDic.FAIL, msg);
+            }
+        } catch (final DuplicateKeyException e) {
+            final String msg = "修改失败，唯一键重复：" + e.getCause().getMessage();
+            log.error(msg + ": mo=" + mo, e);
+            return new Ro(ResultDic.FAIL, msg);
+        } catch (final RuntimeException e) {
+            final String msg = "修改失败，出现运行时异常";
+            log.error(msg + ": mo-" + mo, e);
+            return new Ro(ResultDic.FAIL, msg);
+        }
+    }
+
+    /**
+     * 删除${entityTitle}
+     * 
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @DeleteMapping("/${strutil.toLowerCase(entityNamePrefix)}/${kebab(sputil.uncapitalize(entitySimpleName))}")
+    Ro del(<&
+        for(id in ids){
+            if(!idLP.first) {
+                print(', ');
+            }
+            print('@RequestParam("');
+            print(id.key);
+            print('") final ');
+            print(id.value);
+            print(' ');
+            print(id.key);
+        }
+    &>) {
+        log.info("received delete:/${strutil.toLowerCase(entityNamePrefix)}/${kebab(sputil.uncapitalize(entitySimpleName))}");
+        log.info("${sputil.uncapitalize(entitySimpleName)}Ctrl.del: {}", <&
+            for(id in ids){
+                if(!idLP.first) {
+                    print(', ');
+                }
+                print(id.key);
+            }
+        &>);
+        final int result = svc.del(<&
+            for(id in ids){
+                if(!idLP.first) {
+                    print(', ');
+                }
+                print(id.key);
+            }
+        &>);
+
+        if (result == 1) {
+            final String msg = "删除成功";
+            log.info("{}: id-{}", msg, id);
+            return new Ro(ResultDic.SUCCESS, msg);
+        } else {
+            final String msg = "删除失败，找不到该记录";
+            log.error("{}: id-{}", msg, id);
+            return new Ro(ResultDic.FAIL, msg);
+        }
+    }
+
+    /**
+     * 查询${entityTitle}
+     * 
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @GetMapping("/${strutil.toLowerCase(entityNamePrefix)}/${kebab(sputil.uncapitalize(entitySimpleName))}")
+    PageInfo<${moClassShortName}> list(final ${moClassShortName} mo, @RequestParam(value = "pageNum", required = false) Integer pageNum, @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        log.info("received get:/${strutil.toLowerCase(entityNamePrefix)}/${kebab(sputil.uncapitalize(entitySimpleName))}");
+        log.info("${sputil.uncapitalize(entitySimpleName)}Ctrl.list: {},pageNum-{},pageSize-{}", mo, pageNum, pageSize);
+        if (pageNum == null) {
+            pageNum = 1;
+        }
+        if (pageSize == null) {
+            pageSize = 5;
+        }
+        log.info("list ${moClassShortName}:" + mo + ", pageNum = " + pageNum + ", pageSize = " + pageSize);
+        if (pageSize > 50) {
+            final String msg = "pageSize不能大于50";
+            log.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        final PageInfo<${moClassShortName}> result = svc.list(mo, pageNum, pageSize);
+        log.info("result: " + result);
+        return result;
+    }
+
+    /**
+     * 获取单个${entityTitle}
+     * 
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @GetMapping("/${strutil.toLowerCase(entityNamePrefix)}/${kebab(sputil.uncapitalize(entitySimpleName))}/get-by-id")
+    ${entityName}Mo getById(<&
+        for(id in ids){
+            if(!idLP.first) {
+                print(', ');
+            }
+            print('@RequestParam("');
+            print(id.key);
+            print('") final ');
+            print(id.value);
+            print(' ');
+            print(id.key);
+        }
+    &>) {
+        log.info("received get:/${strutil.toLowerCase(entityNamePrefix)}/${kebab(sputil.uncapitalize(entitySimpleName))}/get-by-id");
+        log.info("${sputil.uncapitalize(entitySimpleName)}Ctrl.getById: {}", id);
+        return svc.getById(id);
+    }
+
+}
