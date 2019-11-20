@@ -1,0 +1,10 @@
+ord:
+  scheduler:
+    # 交易任务执行的间隔（毫秒）
+    tradeFixedDelay: 3000
+    # 结算启动任务执行的间隔(毫秒)，默认5分钟检查一次
+    startSettleFixedDelay: 4000
+    # 结算任务执行的间隔(毫秒)，默认5分钟检查一次
+    settleFixedDelay: 3000
+    # 结算完成的任务执行的间隔(毫秒)，默认5分钟检查一次
+    completeSettleFixedDelay: 50000

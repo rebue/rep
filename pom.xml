@@ -23,7 +23,22 @@
 			</dependency>
 			<dependency>
 				<groupId>com.github.rebue.rep</groupId>
+				<artifactId>rep-svr-feign</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.rebue.rep</groupId>
 				<artifactId>rep-bll</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.rebue.afc</groupId>
+				<artifactId>afc-svr-feign</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.rebue.wxx</groupId>
+				<artifactId>wxx-svr-feign</artifactId>
 				<version>1.1.0</version>
 			</dependency>
 		</dependencies>
@@ -33,5 +48,7 @@
 		<module>rep-api</module>
 		<module>rep-bll</module>
 		<module>rep-svr</module>
+		<module>rep-scheduler-svr</module>
+		<module>rep-svr-feign</module>
 	</modules>
 </project>

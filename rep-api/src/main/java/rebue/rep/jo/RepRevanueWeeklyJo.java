@@ -1,6 +1,7 @@
 package rebue.rep.jo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -42,8 +43,8 @@ public class RepRevanueWeeklyJo implements Serializable {
      * @mbg.generated 自动生成，如需修改，请删除本行
      */
     @Basic(optional = false)
-    @Column(name = "TURNOVER", nullable = false, length = 10)
-    private Long turnover;
+    @Column(name = "TURNOVER", nullable = false, precision = 20, scale = 4)
+    private BigDecimal turnover;
 
     /**
      * 订单数
@@ -60,8 +61,8 @@ public class RepRevanueWeeklyJo implements Serializable {
      * @mbg.generated 自动生成，如需修改，请删除本行
      */
     @Basic(optional = false)
-    @Column(name = "PROFIT", nullable = false, length = 10)
-    private Long profit;
+    @Column(name = "PROFIT", nullable = false, precision = 20, scale = 4)
+    private BigDecimal profit;
 
     /**
      * 成本
@@ -69,8 +70,8 @@ public class RepRevanueWeeklyJo implements Serializable {
      * @mbg.generated 自动生成，如需修改，请删除本行
      */
     @Basic(optional = false)
-    @Column(name = "COST", nullable = false, length = 10)
-    private Long cost;
+    @Column(name = "COST", nullable = false, precision = 20, scale = 4)
+    private BigDecimal cost;
 
     /**
      * 年中的哪一周，为了类型统一就使用Integer
@@ -80,6 +81,15 @@ public class RepRevanueWeeklyJo implements Serializable {
     @Basic(optional = false)
     @Column(name = "WEEK_OF_YEAR", nullable = false, length = 10)
     private Integer weekOfYear;
+
+    /**
+     * 这个周的记录是属于哪一年的
+     *
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @Basic(optional = false)
+    @Column(name = "YEAR", nullable = false, length = 10)
+    private Integer year;
 
     /**
      * 修改时间戳

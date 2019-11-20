@@ -130,7 +130,9 @@ public class RepRevanueAnnualCtrl {
      * @mbg.generated 自动生成，如需修改，请删除本行
      */
     @GetMapping("/rep/revanue-annual")
-    PageInfo<RepRevanueAnnualMo> list(final RepRevanueAnnualMo mo, @RequestParam(value = "pageNum", required = false) Integer pageNum, @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+    PageInfo<RepRevanueAnnualMo> list(final RepRevanueAnnualMo mo,
+            @RequestParam(value = "pageNum", required = false) Integer pageNum,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         log.info("received get:/rep/revanue-annual");
         log.info("revanueAnnualCtrl.list: {},pageNum-{},pageSize-{}", mo, pageNum, pageSize);
         if (pageNum == null) {
@@ -161,4 +163,13 @@ public class RepRevanueAnnualCtrl {
         log.info("revanueAnnualCtrl.getById: {}", id);
         return svc.getById(id);
     }
+
+    /**
+     * 定时任务创建营收报表
+     */
+    @PostMapping("/rep/revanue-annual/create-revenue-report")
+    void createRevenueReportTask() {
+        svc.createRevenueReportTask();
+    }
+
 }

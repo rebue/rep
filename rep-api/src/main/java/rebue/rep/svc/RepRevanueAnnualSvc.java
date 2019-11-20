@@ -10,4 +10,10 @@ import rebue.robotech.svc.BaseSvc;
  * @mbg.generated 自动生成的注释，如需修改本注释，请删除本行
  */
 public interface RepRevanueAnnualSvc extends BaseSvc<java.lang.Long, RepRevanueAnnualMo, RepRevanueAnnualJo> {
+    
+    
+    /**
+     * 定时任务创建营收报表
+     */
+    void createRevenueReportTask();
 }
