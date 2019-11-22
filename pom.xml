@@ -27,6 +27,11 @@
 				<version>1.1.0</version>
 			</dependency>
 			<dependency>
+				<groupId>com.github.rebue.ord</groupId>
+				<artifactId>ord-svr-feign</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+			<dependency>
 				<groupId>com.github.rebue.rep</groupId>
 				<artifactId>rep-bll</artifactId>
 				<version>1.1.0</version>

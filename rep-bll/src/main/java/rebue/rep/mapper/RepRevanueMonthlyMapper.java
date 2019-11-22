@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import rebue.rep.mo.RepRevanueMonthlyMo;
+import rebue.rep.to.UpdateTurnoverTo;
 import rebue.robotech.mapper.MybatisBaseMapper;
 
 @Mapper
@@ -66,6 +67,6 @@ public interface RepRevanueMonthlyMapper extends MybatisBaseMapper<RepRevanueMon
      */
     int countSelective(RepRevanueMonthlyMo record);
     
-    int updateMonthTurnover(@Param("newTurnover") BigDecimal newTurnover,@Param("ordTurnover") BigDecimal oldTurnover,@Param("id") Long id);
+    int updateMonthTurnover(UpdateTurnoverTo to);
 
 }

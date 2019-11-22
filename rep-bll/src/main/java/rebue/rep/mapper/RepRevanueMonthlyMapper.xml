@@ -271,4 +271,19 @@
       </if>
     </where>
   </select>
+  
+  
+      <update id="updateMonthTurnover" parameterType="rebue.rep.to.UpdateTurnoverTo">
+    <!--
+			更新营业利润成本订单数
+    -->
+    update REP_REVANUE_MONTHLY
+    set TURNOVER = #{newTurnover,jdbcType=DECIMAL},
+      ORDER_NUMBER = #{newOrderNumber,jdbcType=BIGINT},
+      PROFIT = #{newProfit,jdbcType=DECIMAL},
+      COST = #{newCost,jdbcType=DECIMAL},
+      MODIFIED_TIMESTAMP = #{modifiedTimestamp,jdbcType=BIGINT}
+    where ID = #{id,jdbcType=BIGINT} and  TURNOVER = #{oldTurnover,jdbcType=DECIMAL}
+  </update>
+  
 </mapper>

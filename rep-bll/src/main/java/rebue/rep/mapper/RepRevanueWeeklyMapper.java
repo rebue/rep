@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import rebue.rep.mo.RepRevanueWeeklyMo;
+import rebue.rep.to.UpdateTurnoverTo;
 import rebue.robotech.mapper.MybatisBaseMapper;
 
 @Mapper
@@ -67,6 +68,6 @@ public interface RepRevanueWeeklyMapper extends MybatisBaseMapper<RepRevanueWeek
     int countSelective(RepRevanueWeeklyMo record);
     
     
-    int updateWeekTurnover(@Param("newTurnover") BigDecimal newTurnover,@Param("ordTurnover") BigDecimal oldTurnover,@Param("id") Long id);
+    int updateWeekTurnover(UpdateTurnoverTo to);
 
 }

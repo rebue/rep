@@ -76,7 +76,7 @@ public class RepRevanueAnnualSvcImpl extends
         log.info("定时创建营收报表任务开始执行");
         Calendar ca = Calendar.getInstance();
         ca.setTime(new Date());
-        int dayCount = (ca.get(Calendar.YEAR) % 400 == 0 && ca.get(Calendar.YEAR) % 100 == 0 ? 366 : 365);
+        double dayCount = (ca.get(Calendar.YEAR) % 400 == 0 && ca.get(Calendar.YEAR) % 100 == 0 ? 366 : 365);
 
         // 查询今年报表是否已经创建
         RepRevanueAnnualMo mo = new RepRevanueAnnualMo();
@@ -84,6 +84,7 @@ public class RepRevanueAnnualSvcImpl extends
         log.info("查询今年报表是否已经创建参数为-{}", mo);
         if (super.getOne(mo) != null) {
             log.info("今年报表已经创建-{}", mo.getYear());
+            return;
         }
         // 创建年报
         RepRevanueAnnualMo addAnnualMo = new RepRevanueAnnualMo();
@@ -120,7 +121,7 @@ public class RepRevanueAnnualSvcImpl extends
         }
         // 创建日报
         log.info("今年的天数为-{}", dayCount);
-        for (int i = 1; i <=dayCount; i++) {
+        for (int i = 1; i <= dayCount; i++) {
             RepRevanueDailyMo addDailyMo = new RepRevanueDailyMo();
             addDailyMo.setYear(ca.get(Calendar.YEAR));
             addDailyMo.setModifiedTimestamp(new Date().getTime());

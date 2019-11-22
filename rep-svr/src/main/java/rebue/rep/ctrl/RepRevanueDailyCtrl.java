@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import rebue.afc.msg.PayDoneMsg;
 import rebue.rep.mo.RepRevanueDailyMo;
 import rebue.rep.svc.RepRevanueDailySvc;
 import rebue.robotech.dic.ResultDic;
@@ -130,7 +132,9 @@ public class RepRevanueDailyCtrl {
      * @mbg.generated 自动生成，如需修改，请删除本行
      */
     @GetMapping("/rep/revanue-daily")
-    PageInfo<RepRevanueDailyMo> list(final RepRevanueDailyMo mo, @RequestParam(value = "pageNum", required = false) Integer pageNum, @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+    PageInfo<RepRevanueDailyMo> list(final RepRevanueDailyMo mo,
+            @RequestParam(value = "pageNum", required = false) Integer pageNum,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         log.info("received get:/rep/revanue-daily");
         log.info("revanueDailyCtrl.list: {},pageNum-{},pageSize-{}", mo, pageNum, pageSize);
         if (pageNum == null) {
@@ -160,5 +164,16 @@ public class RepRevanueDailyCtrl {
         log.info("received get:/rep/revanue-daily/get-by-id");
         log.info("revanueDailyCtrl.getById: {}", id);
         return svc.getById(id);
+    }
+
+    /**
+     * 模拟收到支付完成通知
+     * 
+     * @param mo
+     */
+    @PutMapping("/rep/revanue-daily/modify-revenue")
+    void modifyRevenue(@RequestBody final PayDoneMsg payDoneMsg) {
+        log.info("单元测试收到支付完成通知-{}", payDoneMsg);
+        svc.handlePayNotify(payDoneMsg);
     }
 }

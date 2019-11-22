@@ -18,10 +18,15 @@
 			<groupId>com.github.rebue.afc</groupId>
 			<artifactId>afc-svr-feign</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.github.rebue.wxx</groupId>
 			<artifactId>wxx-svr-feign</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.rebue.ord</groupId>
+			<artifactId>ord-svr-feign</artifactId>
 		</dependency>
 
 

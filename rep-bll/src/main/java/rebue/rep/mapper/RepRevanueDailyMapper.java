@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
 import rebue.rep.mo.RepRevanueDailyMo;
+import rebue.rep.to.UpdateTurnoverTo;
 import rebue.robotech.mapper.MybatisBaseMapper;
 
 @Mapper
@@ -66,8 +68,7 @@ public interface RepRevanueDailyMapper extends MybatisBaseMapper<RepRevanueDaily
      */
     int countSelective(RepRevanueDailyMo record);
     
-    
-    int updateDayTurnover(@Param("newTurnover") BigDecimal newTurnover,@Param("ordTurnover") BigDecimal oldTurnover,@Param("id") Long id);
+    int updateDayTurnover(UpdateTurnoverTo to);
     
 
 

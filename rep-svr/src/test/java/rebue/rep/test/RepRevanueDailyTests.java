@@ -2,9 +2,13 @@ package rebue.rep.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.math.BigDecimal;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import rebue.afc.msg.PayDoneMsg;
 import rebue.rep.mo.RepRevanueDailyMo;
 import rebue.robotech.dic.ResultDic;
 import rebue.robotech.ro.IdRo;
@@ -35,7 +39,7 @@ public class RepRevanueDailyTests {
      *
      * @mbg.generated 自动生成，如需修改，请删除本行
      */
-    @Test
+    // @Test
     public void testCrud() throws IOException, ReflectiveOperationException {
         RepRevanueDailyMo mo = null;
         for (int i = 0; i < 20; i++) {
@@ -67,4 +71,21 @@ public class RepRevanueDailyTests {
         log.info(deleteRo.toString());
         Assertions.assertEquals(ResultDic.SUCCESS, deleteRo.getResult());
     }
+
+   @Test
+    public void modifyRevenue() throws IOException {
+        log.info("测试支付完成通知");
+        PayDoneMsg payDoneMsg = new PayDoneMsg();
+        payDoneMsg.setPayAccountId("5");
+        payDoneMsg.setOrderId("667889772072665088");
+        payDoneMsg.setPayAmount(new BigDecimal("5"));
+        payDoneMsg.setUserId(1l);
+        
+        OkhttpUtils.putByJsonParams(hostUrl + "/rep/revanue-daily/modify-revenue", payDoneMsg);
+    }
+    
+    
+
+    
+
 }
