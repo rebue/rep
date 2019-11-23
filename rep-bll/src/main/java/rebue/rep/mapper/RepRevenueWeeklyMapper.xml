@@ -300,7 +300,7 @@
     <!--
 			更新营业利润成本订单数
     -->
-    update REP_REVANUE_WEEKLY
+    update REP_REVENUE_WEEKLY
     set TURNOVER = #{newTurnover,jdbcType=DECIMAL},
       ORDER_NUMBER = #{newOrderNumber,jdbcType=BIGINT},
       PROFIT = #{newProfit,jdbcType=DECIMAL},

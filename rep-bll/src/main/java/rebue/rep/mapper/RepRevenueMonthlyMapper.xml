@@ -299,7 +299,7 @@
     <!--
 			更新营业利润成本订单数
     -->
-    update REP_REVANUE_MONTHLY
+    update REP_REVENUE_MONTHLY
     set TURNOVER = #{newTurnover,jdbcType=DECIMAL},
       ORDER_NUMBER = #{newOrderNumber,jdbcType=BIGINT},
       PROFIT = #{newProfit,jdbcType=DECIMAL},
