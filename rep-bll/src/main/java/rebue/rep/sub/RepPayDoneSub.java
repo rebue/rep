@@ -14,7 +14,7 @@ import rebue.afc.sgjz.co.SgjzExchangeCo;
 import rebue.afc.sgjz.msg.SgjzPayDoneMsg;
 import rebue.afc.vpay.co.VpayExchangeCo;
 import rebue.afc.vpay.msg.VpayPayDoneMsg;
-import rebue.rep.svc.RepRevanueDailySvc;
+import rebue.rep.svc.RepRevenueDailySvc;
 import rebue.sbs.rabbit.RabbitConsumer;
 import rebue.wxx.wxpay.co.WxpayExchangeCo;
 import rebue.wxx.wxpay.msg.WxpayPayDoneMsg;
@@ -49,7 +49,7 @@ public class RepPayDoneSub implements ApplicationListener<ContextRefreshedEvent>
     private Mapper dozerMapper;
 
     @Resource
-    private RepRevanueDailySvc repRevanueDailySvc;
+    private RepRevenueDailySvc repRevanueDailySvc;
 
     @Override
     public void onApplicationEvent(final ContextRefreshedEvent event) {

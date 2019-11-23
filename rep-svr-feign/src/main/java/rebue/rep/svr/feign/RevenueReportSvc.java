@@ -11,11 +11,11 @@ import rebue.sbs.feign.FeignConfig;
 @FeignClient(name = "rep-svr", configuration = FeignConfig.class, contextId = "rep-svr-feign")
 public interface RevenueReportSvc {
 
-    @PostMapping("/rep/revanue-annual/create-revenue-report")
+    @PostMapping("/rep/revenue-annual/create-revenue-report")
     void createRevenueReportTask();
     
     
-    @PutMapping("/rep/revanue-daily/modify-revenue")
+    @PutMapping("/rep/revenue-daily/modify-revenue")
     void modifyRevenue(@RequestBody final PayDoneMsg payDoneMsg);
 
 }
