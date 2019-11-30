@@ -1,6 +1,9 @@
 package rebue.rep.ctrl;
 
 import com.github.pagehelper.PageInfo;
+
+import java.util.List;
+
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import rebue.afc.msg.PayDoneMsg;
 import rebue.rep.mo.RepRevenueDailyMo;
+import rebue.rep.ro.RepRevenueRo;
 import rebue.rep.svc.RepRevenueDailySvc;
 import rebue.robotech.dic.ResultDic;
 import rebue.robotech.ro.IdRo;
@@ -132,7 +136,9 @@ public class RepRevenueDailyCtrl {
      * @mbg.generated 自动生成，如需修改，请删除本行
      */
     @GetMapping("/rep/revenue-daily")
-    PageInfo<RepRevenueDailyMo> list(final RepRevenueDailyMo mo, @RequestParam(value = "pageNum", required = false) Integer pageNum, @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+    PageInfo<RepRevenueDailyMo> list(final RepRevenueDailyMo mo,
+            @RequestParam(value = "pageNum", required = false) Integer pageNum,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         log.info("received get:/rep/revenue-daily");
         log.info("revenueDailyCtrl.list: {},pageNum-{},pageSize-{}", mo, pageNum, pageSize);
         if (pageNum == null) {
@@ -163,8 +169,7 @@ public class RepRevenueDailyCtrl {
         log.info("revenueDailyCtrl.getById: {}", id);
         return svc.getById(id);
     }
-    
-    
+
     /**
      * 模拟收到支付完成通知
      * 
@@ -175,4 +180,19 @@ public class RepRevenueDailyCtrl {
         log.info("单元测试收到支付完成通知-{}", payDoneMsg);
         svc.handlePayNotify(payDoneMsg);
     }
+
+    /**
+     * 根据店铺id和时间查询统计日报
+     * 
+     * @param shopId
+     * @param revenueTime
+     * @return
+     */
+    @GetMapping("rep/revenue-daily/list-revenue-of-Day")
+    List<RepRevenueRo> listRevenueOfDay(@RequestParam("shopId") final java.lang.Long shopId,
+            @RequestParam("revenueTime") final java.lang.String revenueTime) {
+        log.info("根据店铺id和时间查询统计日报参数为shopId-{},-{}", shopId, revenueTime);
+        return svc.listRevenueOfDay(shopId, revenueTime);
+    }
+
 }

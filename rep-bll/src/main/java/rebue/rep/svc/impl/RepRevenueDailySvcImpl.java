@@ -3,6 +3,9 @@ package rebue.rep.svc.impl;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +32,7 @@ import rebue.rep.mo.RepRevenueDailyMo;
 import rebue.rep.mo.RepRevenueMonthlyMo;
 import rebue.rep.mo.RepRevenueOrderMo;
 import rebue.rep.mo.RepRevenueWeeklyMo;
+import rebue.rep.ro.RepRevenueRo;
 import rebue.rep.svc.RepRevenueAnnualSvc;
 import rebue.rep.svc.RepRevenueDailySvc;
 import rebue.rep.svc.RepRevenueMonthlySvc;
@@ -54,7 +58,9 @@ import rebue.robotech.svc.impl.BaseSvcImpl;
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 @Service
 @Slf4j
-public class RepRevenueDailySvcImpl extends BaseSvcImpl<java.lang.Long, RepRevenueDailyJo, RepRevenueDailyDao, RepRevenueDailyMo, RepRevenueDailyMapper> implements RepRevenueDailySvc {
+public class RepRevenueDailySvcImpl extends
+        BaseSvcImpl<java.lang.Long, RepRevenueDailyJo, RepRevenueDailyDao, RepRevenueDailyMo, RepRevenueDailyMapper>
+        implements RepRevenueDailySvc {
 
     /**
      * @mbg.generated 自动生成，如需修改，请删除本行
@@ -69,10 +75,7 @@ public class RepRevenueDailySvcImpl extends BaseSvcImpl<java.lang.Long, RepReven
         }
         return super.add(mo);
     }
-    
-    
-    
-    
+
     @Resource
     private RepRevenueOrderSvc repRevenueOrderSvc;
 
@@ -116,6 +119,7 @@ public class RepRevenueDailySvcImpl extends BaseSvcImpl<java.lang.Long, RepReven
         if (repRevenueOrderSvc.getOne(getOnlmo) != null) {
             return null;
         }
+
         // 获取订单来获取订单详情
         BigDecimal costTitle = BigDecimal.ZERO;
         log.info("根据订单支付id获取到的订单参数为-{}", payDoneMsg.getOrderId());
@@ -124,6 +128,11 @@ public class RepRevenueDailySvcImpl extends BaseSvcImpl<java.lang.Long, RepReven
         if (orderList.size() < 1) {
             throw new RuntimeException("订单不存在");
         }
+        if (orderList.get(0).getShopId() == null) {
+            log.info("店铺id为空，是线上商品，不需要记录营收-shopId{}", orderList.get(0).getShopId());
+            return null;
+        }
+
         // 获取订单详情计算成本和利润
         for (final OrdOrderMo order : orderList) {
             List<OrdOrderDetailMo> orderDetailList = ordOrderDetailSvc.listAll(order.getId());
@@ -137,9 +146,10 @@ public class RepRevenueDailySvcImpl extends BaseSvcImpl<java.lang.Long, RepReven
 
         }
         ;
+
         // 计算利润
         BigDecimal profitTitle = payDoneMsg.getPayAmount().subtract(costTitle);
-        log.info("当前交易的金额纤细为{}(总金额)-{}(总成本)={}(总利润)", payDoneMsg.getPayAmount(), costTitle, profitTitle);
+        log.info("当前交易的金额明细为{}(总金额)-{}(总成本)={}(总利润)", payDoneMsg.getPayAmount(), costTitle, profitTitle);
         // 更新营收记录
         Calendar ca = Calendar.getInstance();
         ca.setTime(new Date());
@@ -148,7 +158,8 @@ public class RepRevenueDailySvcImpl extends BaseSvcImpl<java.lang.Long, RepReven
         RepRevenueDailyMo dailyMo = new RepRevenueDailyMo();
         dailyMo.setDayOfYear(ca.get(Calendar.DAY_OF_YEAR));
         dailyMo.setYear(ca.get(Calendar.YEAR));
-        RepRevenueDailyMo dailyResult = super.getOne(dailyMo);
+        dailyMo.setShopId(orderList.get(0).getShopId());
+        RepRevenueDailyMo dailyResult = getOrCreatDaily(dailyMo);
         if (dailyResult == null) {
             throw new RuntimeException("获取当天营收记录失败");
         }
@@ -174,7 +185,8 @@ public class RepRevenueDailySvcImpl extends BaseSvcImpl<java.lang.Long, RepReven
             weekMoly.setWeekOfYear(ca.get(Calendar.WEEK_OF_YEAR));
         }
         weekMoly.setYear(ca.get(Calendar.YEAR));
-        RepRevenueWeeklyMo weeklyResult = repRevenueWeeklySvc.getOne(weekMoly);
+        weekMoly.setShopId(orderList.get(0).getShopId());
+        RepRevenueWeeklyMo weeklyResult = getOrCreatWeekly(weekMoly);
         if (weeklyResult == null) {
             throw new RuntimeException("获取当周营收记录失败");
         }
@@ -195,7 +207,9 @@ public class RepRevenueDailySvcImpl extends BaseSvcImpl<java.lang.Long, RepReven
         RepRevenueMonthlyMo Monthly = new RepRevenueMonthlyMo();
         Monthly.setMonthOfYear(ca.get(Calendar.MONTH) + 1);
         Monthly.setYear(ca.get(Calendar.YEAR));
-        RepRevenueMonthlyMo monthlyResult = repRevenueMonthlySvc.getOne(Monthly);
+        Monthly.setShopId(orderList.get(0).getShopId());
+
+        RepRevenueMonthlyMo monthlyResult = getOrCreatDaily(Monthly);
         if (monthlyResult == null) {
             throw new RuntimeException("获取当月营收记录失败");
         }
@@ -215,12 +229,14 @@ public class RepRevenueDailySvcImpl extends BaseSvcImpl<java.lang.Long, RepReven
         // 更新当年营收记录
         RepRevenueAnnualMo annual = new RepRevenueAnnualMo();
         annual.setYear(ca.get(Calendar.YEAR));
-        RepRevenueAnnualMo annualResult = repRevenueAnnualSvc.getOne(annual);
+        annual.setShopId(orderList.get(0).getShopId());
+        RepRevenueAnnualMo annualResult = getOrCreatDaily(annual);
+
         if (annualResult == null) {
             throw new RuntimeException("获取当年营收记录失败");
         }
         UpdateTurnoverTo updateYearTurnoverTo = new UpdateTurnoverTo();
-        updateYearTurnoverTo.setId(1L);
+        updateYearTurnoverTo.setId(annualResult.getId());
         updateYearTurnoverTo.setModifiedTimestamp(new Date().getTime());
         updateYearTurnoverTo.setNewTurnover(annualResult.getTurnover().add(payDoneMsg.getPayAmount()));
         updateYearTurnoverTo.setOldTurnover(annualResult.getTurnover());
@@ -241,4 +257,238 @@ public class RepRevenueDailySvcImpl extends BaseSvcImpl<java.lang.Long, RepReven
         }
         return null;
     }
+
+    private RepRevenueDailyMo getOrCreatDaily(RepRevenueDailyMo mo) {
+        log.info("查询或创建并返回日报的参数为-{}", mo);
+        RepRevenueDailyMo result = super.getOne(mo);
+        log.info("查询或创建并返回日报的结果为-{}", result);
+        if (result != null) {
+            return result;
+        }
+        log.info("记录不存在，创建记录并返回");
+        mo.setModifiedTimestamp(new Date().getTime());
+        mo.setProfit(new BigDecimal("0"));
+        mo.setTurnover(new BigDecimal("0"));
+        mo.setCost(new BigDecimal("0"));
+        mo.setOrderNumber(0l);
+        try {
+            add(mo);
+        } catch (Exception e) {
+            throw new RuntimeException("创建今天营收记录失败");
+        }
+        return mo;
+    }
+
+    private RepRevenueWeeklyMo getOrCreatWeekly(RepRevenueWeeklyMo mo) {
+        log.info("查询或创建并返回周报的参数为-{}", mo);
+        RepRevenueWeeklyMo result = repRevenueWeeklySvc.getOne(mo);
+        log.info("查询或创建并返回周报的结果为-{}", result);
+        if (result != null) {
+            return result;
+        }
+        log.info("记录不存在，创建记录并返回");
+        mo.setModifiedTimestamp(new Date().getTime());
+        mo.setProfit(new BigDecimal("0"));
+        mo.setTurnover(new BigDecimal("0"));
+        mo.setCost(new BigDecimal("0"));
+        mo.setOrderNumber(0l);
+
+        try {
+            repRevenueWeeklySvc.add(mo);
+        } catch (Exception e) {
+            throw new RuntimeException("创建今天营收记录失败");
+        }
+        return mo;
+    }
+
+    private RepRevenueMonthlyMo getOrCreatDaily(RepRevenueMonthlyMo mo) {
+        log.info("查询或创建并返回月报的参数为-{}", mo);
+        RepRevenueMonthlyMo result = repRevenueMonthlySvc.getOne(mo);
+        log.info("查询或创建并返回月报的结果为-{}", result);
+        if (result != null) {
+            return result;
+        }
+        log.info("记录不存在，创建记录并返回");
+        mo.setModifiedTimestamp(new Date().getTime());
+        mo.setProfit(new BigDecimal("0"));
+        mo.setTurnover(new BigDecimal("0"));
+        mo.setCost(new BigDecimal("0"));
+        mo.setOrderNumber(0l);
+
+        try {
+            repRevenueMonthlySvc.add(mo);
+        } catch (Exception e) {
+            throw new RuntimeException("创建今月营收记录失败");
+        }
+        return mo;
+    }
+
+    private RepRevenueAnnualMo getOrCreatDaily(RepRevenueAnnualMo mo) {
+        log.info("查询或创建并返回日报的参数为-{}", mo);
+        RepRevenueAnnualMo result = repRevenueAnnualSvc.getOne(mo);
+        log.info("查询或创建并返回日报的结果为-{}", result);
+        if (result != null) {
+            return result;
+        }
+        log.info("记录不存在，创建记录并返回");
+        mo.setModifiedTimestamp(new Date().getTime());
+        mo.setProfit(new BigDecimal("0"));
+        mo.setTurnover(new BigDecimal("0"));
+        mo.setCost(new BigDecimal("0"));
+        mo.setOrderNumber(0l);
+
+        try {
+            repRevenueAnnualSvc.add(mo);
+        } catch (Exception e) {
+            throw new RuntimeException("创建今年营收记录失败");
+        }
+        return mo;
+    }
+
+    @Override
+    public List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueTime) {
+        List<RepRevenueRo> result = new ArrayList<RepRevenueRo>();
+        // 计算revenueTime属于该日期的那一天。
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date date;
+        try {
+            date = formatter.parse(revenueTime);
+
+            calendar.setTime(date);
+            int revenueDay = calendar.get(Calendar.DAY_OF_YEAR);
+            int revenueYear = Integer.parseInt(revenueTime.substring(0, 4));
+            log.info("查询的是{}年的第{}天的营收记录", revenueYear, revenueDay);
+            // 判断该天是否+3大于该年的最大天数或者是减3小于0
+            Calendar getDayCountCalendar = Calendar.getInstance();
+            getDayCountCalendar.setTime(formatter.parse(revenueTime));
+            int dayCount = (getDayCountCalendar.get(Calendar.YEAR) % 400 == 0
+                    && getDayCountCalendar.get(Calendar.YEAR) % 100 == 0 ? 366 : 365);
+            if (revenueDay + 3 > dayCount || revenueDay - 3 < 0) {
+                log.info("将要查询的收益跨年");
+                if (revenueDay + 3 > dayCount) {
+                    log.info("该天数加3大于选择年，要跨年查第二年的-{}", revenueDay + 3);
+                    // ---------- 先查询选择年的----------
+                    int startDate = dayCount - (6 - (revenueDay + 3 - dayCount));
+                    int endDate = dayCount;
+                    log.info("查询选择年的参数为shopId-{},startDate-{},endDate-{}", shopId, startDate, endDate);
+                    List<RepRevenueDailyMo> targetYearRevenue = _mapper.selectRevenueOfDay(shopId, revenueYear,
+                            startDate, endDate);
+                    log.info("查询选择年的结果为targetYearRevenue-{}", targetYearRevenue);
+                    // 计算查询的第一天的时间
+                    Calendar calendarGetFirstDay = Calendar.getInstance();
+                    calendarGetFirstDay.setTime(formatter.parse(revenueTime));
+                    calendarGetFirstDay.add(Calendar.DAY_OF_YEAR, 0 - (6 - (revenueDay + 3 - dayCount)));
+                    Date firstDate = calendarGetFirstDay.getTime();
+                    log.info("第一天的日期为-{}", formatter.format(firstDate));
+                    for (int i = 0; i < targetYearRevenue.size(); i++) {
+                        RepRevenueRo revenueRo = new RepRevenueRo();
+                        Date Date = calendarGetFirstDay.getTime();
+                        log.info("营收时间为-{}", formatter.format(Date));
+                        revenueRo.setRevenueTime(formatter.format(Date));
+                        revenueRo.setTotal(targetYearRevenue.get(i).getTurnover());
+                        result.add(revenueRo);
+                        calendarGetFirstDay.add(Calendar.DAY_OF_YEAR, 1);
+                    }
+                    // ----------查询选择年的后一年的----------
+                    Calendar calendartargetLastYear = Calendar.getInstance();
+                    calendartargetLastYear.setTime(formatter.parse(String.valueOf(revenueYear + 1) + "-01-01"));
+                    log.info("后一年的第一天为-{}", formatter.format(calendartargetLastYear.getTime()));
+                    int lastYearStartDate = 1;
+                    int lastYearEndDate = revenueDay + 3 - dayCount;
+                    log.info("查询选择年的参数为shopId-{},startDate-{},endDate-{}", shopId, lastYearStartDate, lastYearEndDate);
+                    List<RepRevenueDailyMo> targetLastYearRevenue = _mapper.selectRevenueOfDay(shopId, revenueYear + 1,
+                            lastYearStartDate, lastYearEndDate);
+                    log.info("查询选择年的结果为targetLastYearRevenue-{}", targetLastYearRevenue);
+                    for (int i = 0; i < targetLastYearRevenue.size(); i++) {
+                        RepRevenueRo revenueRo = new RepRevenueRo();
+                        Date Date = calendartargetLastYear.getTime();
+                        log.info("营收时间为-{}", formatter.format(Date));
+                        revenueRo.setRevenueTime(formatter.format(Date));
+                        revenueRo.setTotal(targetYearRevenue.get(i).getTurnover());
+                        result.add(revenueRo);
+                        calendartargetLastYear.add(Calendar.DAY_OF_YEAR, 1);
+                    }
+
+                } else {
+                    log.info("该天数减3小于0，要跨年查去年的的-{}", revenueDay - 3);
+
+                    // ----------查询上一年的----------
+                    Calendar calendarBeforeYear = Calendar.getInstance();
+                    calendarBeforeYear.setTime(formatter.parse(String.valueOf(revenueYear - 1) + "-12-31"));
+                    log.info("上一年最后一天的日期为-{}", formatter.format(calendarBeforeYear.getTime()));
+                    int beforeYearDayCount = (calendarBeforeYear.get(Calendar.YEAR) % 400 == 0
+                            && calendarBeforeYear.get(Calendar.YEAR) % 100 == 0 ? 366 : 365);
+                    int beforeYearstartDate = beforeYearDayCount - (7 - (revenueDay + 4));
+                    int beforeYearendDate = beforeYearDayCount;
+                    log.info("查询上一年的参数为shopId-{},startDate-{},endDate-{}", shopId, beforeYearstartDate,
+                            beforeYearendDate);
+                    List<RepRevenueDailyMo> targetBeforeYearRevenue = _mapper.selectRevenueOfDay(shopId,
+                            revenueYear - 1, beforeYearstartDate, beforeYearendDate);
+                    log.info("查询上一年的结果为targetBeforeYearRevenue-{}", targetBeforeYearRevenue);
+                    calendarBeforeYear.add(Calendar.DAY_OF_YEAR, -(7 - (revenueDay + 4)));
+                    log.info("查询上一年的第一个日期是-{}", formatter.format(calendarBeforeYear.getTime()));
+                    for (int i = 0; i < targetBeforeYearRevenue.size(); i++) {
+                        RepRevenueRo revenueRo = new RepRevenueRo();
+                        Date Date = calendarBeforeYear.getTime();
+                        log.info("营收时间为-{}", formatter.format(Date));
+                        revenueRo.setRevenueTime(formatter.format(Date));
+                        revenueRo.setTotal(targetBeforeYearRevenue.get(i).getTurnover());
+                        result.add(revenueRo);
+                        calendarBeforeYear.add(Calendar.DAY_OF_YEAR, 1);
+                    }
+
+                    // ------------查询选择年的----------
+                    int startDate = 1;
+                    int endDate = revenueDay + 3;
+                    log.info("查询选择年的参数为shopId-{},startDate-{},endDate-{}", shopId, startDate, endDate);
+                    List<RepRevenueDailyMo> targetYearRevenue = _mapper.selectRevenueOfDay(shopId, revenueYear,
+                            startDate, endDate);
+                    log.info("查询选择年的结果为targetYearRevenue-{}", targetYearRevenue);
+                    // 计算查询的第一天的时间
+                    Calendar calendarGetFirstDay = Calendar.getInstance();
+                    calendarGetFirstDay.setTime(formatter.parse(String.valueOf(revenueYear) + "-01-01"));
+                    log.info("第一天为-{}", formatter.format(calendarGetFirstDay.getTime()));
+                    for (int i = 0; i < targetYearRevenue.size(); i++) {
+                        RepRevenueRo revenueRo = new RepRevenueRo();
+                        Date Date = calendarGetFirstDay.getTime();
+                        log.info("营收时间为-{}", formatter.format(Date));
+                        revenueRo.setRevenueTime(formatter.format(Date));
+                        revenueRo.setTotal(targetYearRevenue.get(i).getTurnover());
+                        result.add(revenueRo);
+                        calendarGetFirstDay.add(Calendar.DAY_OF_YEAR, 1);
+                    }
+
+                }
+            } else {
+                log.info("将要查询的收益没有跨年");
+                int startDate = revenueDay - 3;
+                int endDate = revenueDay + 3;
+                log.info("查询选择年的参数为shopId-{},startDate-{},endDate-{}", shopId, startDate, endDate);
+                List<RepRevenueDailyMo> targetYearRevenue = _mapper.selectRevenueOfDay(shopId, revenueYear, startDate,
+                        endDate);
+                log.info("查询选择年的结果为targetYearRevenue-{}", targetYearRevenue);
+                // 计算查询的第一天的时间
+                Calendar calendarGetFirstDay = Calendar.getInstance();
+                calendarGetFirstDay.setTime(formatter.parse(revenueTime));
+                calendarGetFirstDay.add(Calendar.DAY_OF_YEAR, -3);
+                Date firstDate = calendarGetFirstDay.getTime();
+                log.info("第一天的日期为-{}", formatter.format(firstDate));
+                for (int i = 0; i < targetYearRevenue.size(); i++) {
+                    RepRevenueRo revenueRo = new RepRevenueRo();
+                    Date Date = calendarGetFirstDay.getTime();
+                    log.info("营收时间为-{}", formatter.format(Date));
+                    revenueRo.setRevenueTime(formatter.format(Date));
+                    revenueRo.setTotal(targetYearRevenue.get(i).getTurnover());
+                    result.add(revenueRo);
+                    calendarGetFirstDay.add(Calendar.DAY_OF_YEAR, 1);
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        log.info("即将返回的结果-{}", result);
+        return result;
+    }
+
 }
