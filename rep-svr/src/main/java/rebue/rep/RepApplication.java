@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 // 这个注解是为了使该包内的过滤器生效。
 @ServletComponentScan("rebue.sbs.smx.filter")
 @SpringCloudApplication
-@EnableFeignClients(basePackages = { "rebue.ord.svr.feign"})
+@EnableFeignClients(basePackages = { "rebue.ord.svr.feign", "rebue.slr.svr.feign" })
 public class RepApplication {
     public static void main(final String[] args) {
         SpringApplication.run(RepApplication.class, args);

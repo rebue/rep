@@ -1,15 +1,16 @@
 package rebue.rep.svc.impl;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
 import rebue.rep.dao.RepRevenueAnnualDao;
 import rebue.rep.jo.RepRevenueAnnualJo;
 import rebue.rep.mapper.RepRevenueAnnualMapper;
@@ -22,6 +23,8 @@ import rebue.rep.svc.RepRevenueDailySvc;
 import rebue.rep.svc.RepRevenueMonthlySvc;
 import rebue.rep.svc.RepRevenueWeeklySvc;
 import rebue.robotech.svc.impl.BaseSvcImpl;
+import rebue.slr.mo.SlrShopMo;
+import rebue.slr.svr.feign.SlrShopSvc;
 
 /**
  * 报表-营收报表--年报
@@ -40,7 +43,9 @@ import rebue.robotech.svc.impl.BaseSvcImpl;
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 @Service
 @Slf4j
-public class RepRevenueAnnualSvcImpl extends BaseSvcImpl<java.lang.Long, RepRevenueAnnualJo, RepRevenueAnnualDao, RepRevenueAnnualMo, RepRevenueAnnualMapper> implements RepRevenueAnnualSvc {
+public class RepRevenueAnnualSvcImpl extends
+        BaseSvcImpl<java.lang.Long, RepRevenueAnnualJo, RepRevenueAnnualDao, RepRevenueAnnualMo, RepRevenueAnnualMapper>
+        implements RepRevenueAnnualSvc {
 
     /**
      * @mbg.generated 自动生成，如需修改，请删除本行
@@ -55,8 +60,7 @@ public class RepRevenueAnnualSvcImpl extends BaseSvcImpl<java.lang.Long, RepReve
         }
         return super.add(mo);
     }
-    
-    
+
     @Resource
     private RepRevenueMonthlySvc repRevenueMonthlySvc;
 
@@ -66,71 +70,85 @@ public class RepRevenueAnnualSvcImpl extends BaseSvcImpl<java.lang.Long, RepReve
     @Resource
     private RepRevenueDailySvc repRevenueDailySvc;
 
+    @Resource
+    private SlrShopSvc slrShopSvc;
+
     /**
      * 创建营收报表任务(凌晨一点运行一次)
      * 
      */
     @Override
     public void createRevenueReportTask() {
-        log.info("定时创建营收报表任务开始执行");
-        Calendar ca = Calendar.getInstance();
-        ca.setTime(new Date());
-        double dayCount = (ca.get(Calendar.YEAR) % 400 == 0 && ca.get(Calendar.YEAR) % 100 == 0 ? 366 : 365);
+        // 获取所有店铺
+        List<SlrShopMo> list = slrShopSvc.listAll();
+        log.info("获取所有店铺的返回值为-{}", list);
+        for (SlrShopMo shop : list) {
 
-        // 查询今年报表是否已经创建
-        RepRevenueAnnualMo mo = new RepRevenueAnnualMo();
-        mo.setYear(ca.get(Calendar.YEAR));
-        log.info("查询今年报表是否已经创建参数为-{}", mo);
-        if (super.getOne(mo) != null) {
-            log.info("今年报表已经创建-{}", mo.getYear());
-            return;
-        }
-        // 创建年报
-        RepRevenueAnnualMo addAnnualMo = new RepRevenueAnnualMo();
-        addAnnualMo.setYear(ca.get(Calendar.YEAR));
-        addAnnualMo.setModifiedTimestamp(new Date().getTime());
-        log.info("创建年报的参数为-{}", addAnnualMo);
-        if (add(addAnnualMo) != 1) {
-            log.error("创建年报失败");
-            throw new RuntimeException("创建年报失败");
-        }
-        // 创建月报
-        for (int i = 1; i <= 12; i++) {
-            RepRevenueMonthlyMo addMonthlyMo = new RepRevenueMonthlyMo();
-            addMonthlyMo.setYear(ca.get(Calendar.YEAR));
-            addMonthlyMo.setModifiedTimestamp(new Date().getTime());
-            addMonthlyMo.setMonthOfYear(i);
-            if (repRevenueMonthlySvc.add(addMonthlyMo) != 1) {
-                log.error("创建第{}个月报失败", i);
-                throw new RuntimeException("创建第" + i + "个月报失败");
-            }
-        }
-        // 创建周报
-        int weekCout = (int) Math.ceil(dayCount / 7);
-        log.info("今年的周数为-{}", weekCout);
-        for (int i = 1; i <= weekCout; i++) {
-            RepRevenueWeeklyMo addWeeklyMo = new RepRevenueWeeklyMo();
-            addWeeklyMo.setYear(ca.get(Calendar.YEAR));
-            addWeeklyMo.setModifiedTimestamp(new Date().getTime());
-            addWeeklyMo.setWeekOfYear(i);
-            if (repRevenueWeeklySvc.add(addWeeklyMo) != 1) {
-                log.error("创建第{}个周报失败", i);
-                throw new RuntimeException("创建第" + i + "个周报失败");
-            }
-        }
-        // 创建日报
-        log.info("今年的天数为-{}", dayCount);
-        for (int i = 1; i <= dayCount; i++) {
-            RepRevenueDailyMo addDailyMo = new RepRevenueDailyMo();
-            addDailyMo.setYear(ca.get(Calendar.YEAR));
-            addDailyMo.setModifiedTimestamp(new Date().getTime());
-            addDailyMo.setDayOfYear(i);
-            if (repRevenueDailySvc.add(addDailyMo) != 1) {
-                log.error("创建第{}个日报失败", i);
-                throw new RuntimeException("创建第" + i + "个日报失败");
-            }
-        }
+            log.info("定时创建营收报表任务开始执行");
+            Calendar ca = Calendar.getInstance();
+            ca.setTime(new Date());
+            double dayCount = (ca.get(Calendar.YEAR) % 400 == 0 && ca.get(Calendar.YEAR) % 100 == 0 ? 366 : 365);
 
+            // 查询今年报表是否已经创建
+            RepRevenueAnnualMo mo = new RepRevenueAnnualMo();
+            mo.setShopId(shop.getId());
+            mo.setYear(ca.get(Calendar.YEAR));
+            log.info("查询今年报表是否已经创建参数为-{}", mo);
+            if (super.getOne(mo) != null) {
+                log.info("今年报表已经创建-{}", mo.getYear());
+                return;
+            }
+            // 创建年报
+            RepRevenueAnnualMo addAnnualMo = new RepRevenueAnnualMo();
+            addAnnualMo.setYear(ca.get(Calendar.YEAR));
+            addAnnualMo.setModifiedTimestamp(new Date().getTime());
+            addAnnualMo.setShopId(shop.getId());
+            log.info("创建年报的参数为-{}", addAnnualMo);
+            if (add(addAnnualMo) != 1) {
+                log.error("创建年报失败");
+                throw new RuntimeException("创建年报失败");
+            }
+            // 创建月报
+            for (int i = 1; i <= 12; i++) {
+                RepRevenueMonthlyMo addMonthlyMo = new RepRevenueMonthlyMo();
+                addMonthlyMo.setYear(ca.get(Calendar.YEAR));
+                addMonthlyMo.setModifiedTimestamp(new Date().getTime());
+                addMonthlyMo.setMonthOfYear(i);
+                addMonthlyMo.setShopId(shop.getId());
+                if (repRevenueMonthlySvc.add(addMonthlyMo) != 1) {
+                    log.error("创建第{}个月报失败", i);
+                    throw new RuntimeException("创建第" + i + "个月报失败");
+                }
+            }
+            // 创建周报
+            int weekCout = (int) Math.ceil(dayCount / 7);
+            log.info("今年的周数为-{}", weekCout);
+            for (int i = 1; i <= weekCout; i++) {
+                RepRevenueWeeklyMo addWeeklyMo = new RepRevenueWeeklyMo();
+                addWeeklyMo.setYear(ca.get(Calendar.YEAR));
+                addWeeklyMo.setModifiedTimestamp(new Date().getTime());
+                addWeeklyMo.setWeekOfYear(i);
+                addWeeklyMo.setShopId(shop.getId());
+                if (repRevenueWeeklySvc.add(addWeeklyMo) != 1) {
+                    log.error("创建第{}个周报失败", i);
+                    throw new RuntimeException("创建第" + i + "个周报失败");
+                }
+            }
+            // 创建日报
+            log.info("今年的天数为-{}", dayCount);
+            for (int i = 1; i <= dayCount; i++) {
+                RepRevenueDailyMo addDailyMo = new RepRevenueDailyMo();
+                addDailyMo.setYear(ca.get(Calendar.YEAR));
+                addDailyMo.setModifiedTimestamp(new Date().getTime());
+                addDailyMo.setDayOfYear(i);
+                addDailyMo.setShopId(shop.getId());
+                if (repRevenueDailySvc.add(addDailyMo) != 1) {
+                    log.error("创建第{}个日报失败", i);
+                    throw new RuntimeException("创建第" + i + "个日报失败");
+                }
+            }
+
+        }
     }
-    
+
 }

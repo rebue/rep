@@ -1,8 +1,7 @@
 package rebue.rep.ctrl;
 
-import com.github.pagehelper.PageInfo;
 import javax.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +10,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.github.pagehelper.PageInfo;
+
+import lombok.extern.slf4j.Slf4j;
 import rebue.rep.mo.RepRevenueAnnualMo;
 import rebue.rep.svc.RepRevenueAnnualSvc;
 import rebue.robotech.dic.ResultDic;
@@ -130,7 +133,9 @@ public class RepRevenueAnnualCtrl {
      * @mbg.generated 自动生成，如需修改，请删除本行
      */
     @GetMapping("/rep/revenue-annual")
-    PageInfo<RepRevenueAnnualMo> list(final RepRevenueAnnualMo mo, @RequestParam(value = "pageNum", required = false) Integer pageNum, @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+    PageInfo<RepRevenueAnnualMo> list(final RepRevenueAnnualMo mo,
+            @RequestParam(value = "pageNum", required = false) Integer pageNum,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         log.info("received get:/rep/revenue-annual");
         log.info("revenueAnnualCtrl.list: {},pageNum-{},pageSize-{}", mo, pageNum, pageSize);
         if (pageNum == null) {
@@ -161,8 +166,7 @@ public class RepRevenueAnnualCtrl {
         log.info("revenueAnnualCtrl.getById: {}", id);
         return svc.getById(id);
     }
-    
-    
+
     /**
      * 定时任务创建营收报表
      */

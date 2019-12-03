@@ -29,7 +29,16 @@
 			<artifactId>ord-svr-feign</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.github.rebue.slr</groupId>
+			<artifactId>slr-api</artifactId>
+		</dependency>
 
+		<dependency>
+			<groupId>com.github.rebue.slr</groupId>
+			<artifactId>slr-svr-feign</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>com.github.rebue.rep</groupId>
 			<artifactId>rep-api</artifactId>
