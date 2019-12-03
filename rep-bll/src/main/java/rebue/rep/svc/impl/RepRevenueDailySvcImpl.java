@@ -346,144 +346,50 @@ public class RepRevenueDailySvcImpl extends
     }
 
     @Override
-    public List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueTime) {
+    public List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime) {
         List<RepRevenueRo> result = new ArrayList<RepRevenueRo>();
         // 计算revenueTime属于该日期的那一天。
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date date;
+        Date revenueStartDate;
+        Date revenueEndDate;
         try {
-            date = formatter.parse(revenueTime);
-
-            calendar.setTime(date);
-            int revenueDay = calendar.get(Calendar.DAY_OF_YEAR);
-            int revenueYear = Integer.parseInt(revenueTime.substring(0, 4));
-            log.info("查询的是{}年的第{}天的营收记录", revenueYear, revenueDay);
-            // 判断该天是否+3大于该年的最大天数或者是减3小于0
-            Calendar getDayCountCalendar = Calendar.getInstance();
-            getDayCountCalendar.setTime(formatter.parse(revenueTime));
-            int dayCount = (getDayCountCalendar.get(Calendar.YEAR) % 400 == 0
-                    && getDayCountCalendar.get(Calendar.YEAR) % 100 == 0 ? 366 : 365);
-            if (revenueDay + 3 > dayCount || revenueDay - 3 < 0) {
-                log.info("将要查询的收益跨年");
-                if (revenueDay + 3 > dayCount) {
-                    log.info("该天数加3大于选择年，要跨年查第二年的-{}", revenueDay + 3);
-                    // ---------- 先查询选择年的----------
-                    int startDate = dayCount - (6 - (revenueDay + 3 - dayCount));
-                    int endDate = dayCount;
-                    log.info("查询选择年的参数为shopId-{},startDate-{},endDate-{}", shopId, startDate, endDate);
-                    List<RepRevenueDailyMo> targetYearRevenue = _mapper.selectRevenueOfDay(shopId, revenueYear,
-                            startDate, endDate);
-                    log.info("查询选择年的结果为targetYearRevenue-{}", targetYearRevenue);
-                    // 计算查询的第一天的时间
-                    Calendar calendarGetFirstDay = Calendar.getInstance();
-                    calendarGetFirstDay.setTime(formatter.parse(revenueTime));
-                    calendarGetFirstDay.add(Calendar.DAY_OF_YEAR, 0 - (6 - (revenueDay + 3 - dayCount)));
-                    Date firstDate = calendarGetFirstDay.getTime();
-                    log.info("第一天的日期为-{}", formatter.format(firstDate));
-                    for (int i = 0; i < targetYearRevenue.size(); i++) {
-                        RepRevenueRo revenueRo = new RepRevenueRo();
-                        Date Date = calendarGetFirstDay.getTime();
-                        log.info("营收时间为-{}", formatter.format(Date));
-                        revenueRo.setRevenueTime(formatter.format(Date));
-                        revenueRo.setTotal(targetYearRevenue.get(i).getTurnover());
-                        result.add(revenueRo);
-                        calendarGetFirstDay.add(Calendar.DAY_OF_YEAR, 1);
-                    }
-                    // ----------查询选择年的后一年的----------
-                    Calendar calendartargetLastYear = Calendar.getInstance();
-                    calendartargetLastYear.setTime(formatter.parse(String.valueOf(revenueYear + 1) + "-01-01"));
-                    log.info("后一年的第一天为-{}", formatter.format(calendartargetLastYear.getTime()));
-                    int lastYearStartDate = 1;
-                    int lastYearEndDate = revenueDay + 3 - dayCount;
-                    log.info("查询选择年的参数为shopId-{},startDate-{},endDate-{}", shopId, lastYearStartDate, lastYearEndDate);
-                    List<RepRevenueDailyMo> targetLastYearRevenue = _mapper.selectRevenueOfDay(shopId, revenueYear + 1,
-                            lastYearStartDate, lastYearEndDate);
-                    log.info("查询选择年的结果为targetLastYearRevenue-{}", targetLastYearRevenue);
-                    for (int i = 0; i < targetLastYearRevenue.size(); i++) {
-                        RepRevenueRo revenueRo = new RepRevenueRo();
-                        Date Date = calendartargetLastYear.getTime();
-                        log.info("营收时间为-{}", formatter.format(Date));
-                        revenueRo.setRevenueTime(formatter.format(Date));
-                        revenueRo.setTotal(targetYearRevenue.get(i).getTurnover());
-                        result.add(revenueRo);
-                        calendartargetLastYear.add(Calendar.DAY_OF_YEAR, 1);
-                    }
-
-                } else {
-                    log.info("该天数减3小于0，要跨年查去年的的-{}", revenueDay - 3);
-
-                    // ----------查询上一年的----------
-                    Calendar calendarBeforeYear = Calendar.getInstance();
-                    calendarBeforeYear.setTime(formatter.parse(String.valueOf(revenueYear - 1) + "-12-31"));
-                    log.info("上一年最后一天的日期为-{}", formatter.format(calendarBeforeYear.getTime()));
-                    int beforeYearDayCount = (calendarBeforeYear.get(Calendar.YEAR) % 400 == 0
-                            && calendarBeforeYear.get(Calendar.YEAR) % 100 == 0 ? 366 : 365);
-                    int beforeYearstartDate = beforeYearDayCount - (7 - (revenueDay + 4));
-                    int beforeYearendDate = beforeYearDayCount;
-                    log.info("查询上一年的参数为shopId-{},startDate-{},endDate-{}", shopId, beforeYearstartDate,
-                            beforeYearendDate);
-                    List<RepRevenueDailyMo> targetBeforeYearRevenue = _mapper.selectRevenueOfDay(shopId,
-                            revenueYear - 1, beforeYearstartDate, beforeYearendDate);
-                    log.info("查询上一年的结果为targetBeforeYearRevenue-{}", targetBeforeYearRevenue);
-                    calendarBeforeYear.add(Calendar.DAY_OF_YEAR, -(7 - (revenueDay + 4)));
-                    log.info("查询上一年的第一个日期是-{}", formatter.format(calendarBeforeYear.getTime()));
-                    for (int i = 0; i < targetBeforeYearRevenue.size(); i++) {
-                        RepRevenueRo revenueRo = new RepRevenueRo();
-                        Date Date = calendarBeforeYear.getTime();
-                        log.info("营收时间为-{}", formatter.format(Date));
-                        revenueRo.setRevenueTime(formatter.format(Date));
-                        revenueRo.setTotal(targetBeforeYearRevenue.get(i).getTurnover());
-                        result.add(revenueRo);
-                        calendarBeforeYear.add(Calendar.DAY_OF_YEAR, 1);
-                    }
-
-                    // ------------查询选择年的----------
-                    int startDate = 1;
-                    int endDate = revenueDay + 3;
-                    log.info("查询选择年的参数为shopId-{},startDate-{},endDate-{}", shopId, startDate, endDate);
-                    List<RepRevenueDailyMo> targetYearRevenue = _mapper.selectRevenueOfDay(shopId, revenueYear,
-                            startDate, endDate);
-                    log.info("查询选择年的结果为targetYearRevenue-{}", targetYearRevenue);
-                    // 计算查询的第一天的时间
-                    Calendar calendarGetFirstDay = Calendar.getInstance();
-                    calendarGetFirstDay.setTime(formatter.parse(String.valueOf(revenueYear) + "-01-01"));
-                    log.info("第一天为-{}", formatter.format(calendarGetFirstDay.getTime()));
-                    for (int i = 0; i < targetYearRevenue.size(); i++) {
-                        RepRevenueRo revenueRo = new RepRevenueRo();
-                        Date Date = calendarGetFirstDay.getTime();
-                        log.info("营收时间为-{}", formatter.format(Date));
-                        revenueRo.setRevenueTime(formatter.format(Date));
-                        revenueRo.setTotal(targetYearRevenue.get(i).getTurnover());
-                        result.add(revenueRo);
-                        calendarGetFirstDay.add(Calendar.DAY_OF_YEAR, 1);
-                    }
-
-                }
+            revenueStartDate = formatter.parse(revenueStartTime);
+            revenueEndDate = formatter.parse(revenueEndTime);
+            calendar.setTime(revenueStartDate);
+            int revenueStaetDay = calendar.get(Calendar.DAY_OF_YEAR);
+            int revenueStaetYear = Integer.parseInt(revenueStartTime.substring(0, 4));
+            log.info("查询开始年是{}的第{}天的营收记录", revenueStaetYear, revenueStaetDay);
+            calendar.setTime(revenueEndDate);
+            int revenueEndDay = calendar.get(Calendar.DAY_OF_YEAR);
+            int revenueEndYear = Integer.parseInt(revenueEndTime.substring(0, 4));
+            log.info("查询结束年是{}的第{}天的营收记录", revenueEndYear, revenueEndDay);
+            log.info("查询日报的营收记录参数为{},{},{},{},{}", shopId, revenueStaetYear, revenueStaetDay, revenueEndYear,
+                    revenueEndDay);
+            List<RepRevenueDailyMo> dayRevenueResult = new ArrayList<>();
+            if (revenueStaetYear != revenueEndYear) {
+                dayRevenueResult = _mapper.selectRevenueOfDay1(shopId, revenueStaetYear, revenueStaetDay,
+                        revenueEndYear, revenueEndDay);
+                log.info("查询日报的营收记录结果为{}", dayRevenueResult);
             } else {
-                log.info("将要查询的收益没有跨年");
-                int startDate = revenueDay - 3;
-                int endDate = revenueDay + 3;
-                log.info("查询选择年的参数为shopId-{},startDate-{},endDate-{}", shopId, startDate, endDate);
-                List<RepRevenueDailyMo> targetYearRevenue = _mapper.selectRevenueOfDay(shopId, revenueYear, startDate,
-                        endDate);
-                log.info("查询选择年的结果为targetYearRevenue-{}", targetYearRevenue);
-                // 计算查询的第一天的时间
-                Calendar calendarGetFirstDay = Calendar.getInstance();
-                calendarGetFirstDay.setTime(formatter.parse(revenueTime));
-                calendarGetFirstDay.add(Calendar.DAY_OF_YEAR, -3);
-                Date firstDate = calendarGetFirstDay.getTime();
-                log.info("第一天的日期为-{}", formatter.format(firstDate));
-                for (int i = 0; i < targetYearRevenue.size(); i++) {
-                    RepRevenueRo revenueRo = new RepRevenueRo();
-                    Date Date = calendarGetFirstDay.getTime();
-                    log.info("营收时间为-{}", formatter.format(Date));
-                    revenueRo.setRevenueTime(formatter.format(Date));
-                    revenueRo.setTotal(targetYearRevenue.get(i).getTurnover());
-                    result.add(revenueRo);
-                    calendarGetFirstDay.add(Calendar.DAY_OF_YEAR, 1);
-                }
+                dayRevenueResult = _mapper.selectRevenueOfDay2(shopId, revenueStaetYear, revenueStaetDay,
+                        revenueEndYear, revenueEndDay);
+                log.info("查询日报的营收记录结果为{}", dayRevenueResult);
             }
+            // 计算开始时间
+            Calendar calendarGetStartDay = Calendar.getInstance();
+            calendarGetStartDay.setTime(formatter.parse(revenueStartTime));
+            log.info("开始时间-{}", formatter.format(calendarGetStartDay.getTime()));
+            for (RepRevenueDailyMo item : dayRevenueResult) {
+                RepRevenueRo revenueRo = new RepRevenueRo();
+                Date Date = calendarGetStartDay.getTime();
+                log.info("营收时间为-{}", formatter.format(Date));
+                revenueRo.setRevenueTime(formatter.format(Date));
+                revenueRo.setTotal(item.getTurnover());
+                result.add(revenueRo);
+                calendarGetStartDay.add(Calendar.DAY_OF_YEAR, 1);
+            }
+
         } catch (ParseException e) {
             e.printStackTrace();
         }

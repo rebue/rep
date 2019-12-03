@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Scanner;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -94,7 +93,7 @@ public class RepRevenueDailyTests {
      * 
      * @throws java.text.ParseException
      */
-    // @Test
+     @Test
     public void method_2() throws java.text.ParseException {
         // 创建Calendar对象
         Calendar calendar = Calendar.getInstance();
@@ -118,23 +117,27 @@ public class RepRevenueDailyTests {
         calendar1.set(Calendar.DATE, 1);
         calendar1.roll(Calendar.DATE, -1);
         System.out.println(calendar1.getTimeInMillis());
-        
-        
+
         final Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         final int last = cal.getActualMinimum(Calendar.DAY_OF_YEAR);
         cal.set(Calendar.DAY_OF_YEAR, last);
-        System.out.println(format.format(cal.getTime()));
+        System.out.println("----------------");
         
+        String date1 = "2019-12-31";
+        cal.setTime(format.parse(date1));
+        cal.add(Calendar.DAY_OF_YEAR,1);
+        System.out.println(format.format(cal.getTime()));
+
     }
 
-   @Test
+  //  @Test
     public void textRevenue() throws IOException {
 //        final String listResult = OkhttpUtils.get(hostUrl + "/rep/revenue-daily/list-revenue-of-Day?shopId="
 //                + 583124897568522240l + "&revenueTime=2019-11-25");
-        
+
         final String listResult = OkhttpUtils.get(hostUrl + "/rep/revenue-daily/list-revenue-of-Day?shopId="
-                + 583124897568522240l + "&revenueTime=2019-12-31");
+                + 583124897568522240l + "&revenueStartTime=2019-12-30" + "&revenueEndTime=2020-01-03");
 
         System.out.println(listResult);
 

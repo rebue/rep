@@ -17,5 +17,6 @@ public interface RepRevenueDailySvc extends BaseSvc<java.lang.Long, RepRevenueDa
 
     Void handlePayNotify(PayDoneMsg payDoneMsg);
 
-    List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueTime) ;
+
+    List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime);
 }

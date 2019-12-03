@@ -190,9 +190,9 @@ public class RepRevenueDailyCtrl {
      */
     @GetMapping("rep/revenue-daily/list-revenue-of-Day")
     List<RepRevenueRo> listRevenueOfDay(@RequestParam("shopId") final java.lang.Long shopId,
-            @RequestParam("revenueTime") final java.lang.String revenueTime) {
-        log.info("根据店铺id和时间查询统计日报参数为shopId-{},-{}", shopId, revenueTime);
-        return svc.listRevenueOfDay(shopId, revenueTime);
+            @RequestParam("revenueStartTime") final java.lang.String revenueStartTime, @RequestParam("revenueEndTime") final java.lang.String revenueEndTime) {
+        log.info("根据店铺id和时间查询统计日报参数为shopId-{},-{},-{}", shopId, revenueStartTime,revenueEndTime);
+        return svc.listRevenueOfDay(shopId, revenueStartTime,revenueEndTime);
     }
 
 }

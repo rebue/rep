@@ -24,6 +24,7 @@ public interface RevenueReportSvc {
 
     @GetMapping("rep/revenue-daily/list-revenue-of-Day")
     List<RepRevenueRo> listRevenueOfDay(@RequestParam("shopId") final java.lang.Long shopId,
-            @RequestParam("revenueTime") final java.lang.String revenueTime);
+            @RequestParam("revenueStartTime") final java.lang.String revenueStartTime,
+            @RequestParam("revenueEndTime") final java.lang.String revenueEndTime);
 
 }
