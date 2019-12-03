@@ -1,7 +1,10 @@
 package rebue.rep.svc;
 
+import java.util.List;
+
 import rebue.rep.jo.RepRevenueAnnualJo;
 import rebue.rep.mo.RepRevenueAnnualMo;
+import rebue.rep.ro.RepRevenueRo;
 import rebue.robotech.svc.BaseSvc;
 
 /**
@@ -12,4 +15,6 @@ import rebue.robotech.svc.BaseSvc;
 public interface RepRevenueAnnualSvc extends BaseSvc<java.lang.Long, RepRevenueAnnualMo, RepRevenueAnnualJo> {
 
     void createRevenueReportTask();
+
+    List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime);
 }

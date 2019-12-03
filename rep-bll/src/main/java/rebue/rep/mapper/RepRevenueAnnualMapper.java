@@ -2,7 +2,11 @@ package rebue.rep.mapper;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
 import rebue.rep.mo.RepRevenueAnnualMo;
+import rebue.rep.mo.RepRevenueDailyMo;
 import rebue.rep.to.UpdateTurnoverTo;
 import rebue.robotech.mapper.MybatisBaseMapper;
 
@@ -64,4 +68,9 @@ public interface RepRevenueAnnualMapper extends MybatisBaseMapper<RepRevenueAnnu
     int countSelective(RepRevenueAnnualMo record);
     
     int updateYearTurnover(UpdateTurnoverTo to);
+    
+    
+    @Select("select * from REP_REVENUE_ANNUAL  where  SHOP_ID  = #{shopId,jdbcType=TINYINT} and YEAR >=  #{revenueStartYear} and   YEAR <=  #{revenueEndYear}    order by YEAR   ")
+    List<RepRevenueDailyMo> selectRevenueOfYear(@Param("shopId") Long shopId,@Param("revenueStartYear") int revenueStartYear, @Param("revenueEndYear") int revenueEndYear);
+
 }

@@ -1,5 +1,8 @@
 package rebue.rep.svc.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +21,7 @@ import rebue.rep.mo.RepRevenueAnnualMo;
 import rebue.rep.mo.RepRevenueDailyMo;
 import rebue.rep.mo.RepRevenueMonthlyMo;
 import rebue.rep.mo.RepRevenueWeeklyMo;
+import rebue.rep.ro.RepRevenueRo;
 import rebue.rep.svc.RepRevenueAnnualSvc;
 import rebue.rep.svc.RepRevenueDailySvc;
 import rebue.rep.svc.RepRevenueMonthlySvc;
@@ -149,6 +153,41 @@ public class RepRevenueAnnualSvcImpl extends
             }
 
         }
+    }
+    
+    @Override
+    public List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime) {
+        List<RepRevenueRo> result = new ArrayList<RepRevenueRo>();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            int revenueStartYear = Integer.parseInt(revenueStartTime.substring(0, 4));
+            log.info("查询开始年是{}营收记录", revenueStartYear);
+            int revenueEndYear = Integer.parseInt(revenueEndTime.substring(0, 4));
+            log.info("查询结束年是{}营收记录", revenueEndYear);
+            log.info("查询年报的营收记录参数为{},{},{}", shopId, revenueStartYear, revenueEndYear);
+            List<RepRevenueDailyMo> revenueResult = new ArrayList<>();
+            revenueResult = _mapper.selectRevenueOfYear(shopId, revenueStartYear, revenueEndYear);
+            log.info("查询年报的营收记录结果为{}", revenueResult);
+
+            // 计算开始时间
+            Calendar calendarGetStartDay = Calendar.getInstance();
+            calendarGetStartDay.setTime(formatter.parse(revenueStartTime));
+            log.info("开始时间-{}", formatter.format(calendarGetStartDay.getTime()));
+            for (RepRevenueDailyMo item : revenueResult) {
+                RepRevenueRo revenueRo = new RepRevenueRo();
+                Date Date = calendarGetStartDay.getTime();
+                log.info("营收时间为-{}", formatter.format(Date));
+                revenueRo.setRevenueTime(formatter.format(Date));
+                revenueRo.setTotal(item.getTurnover());
+                result.add(revenueRo);
+                calendarGetStartDay.add(Calendar.YEAR, 1);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        log.info("即将返回的结果-{}", result);
+        return result;
     }
 
 }

@@ -1,5 +1,7 @@
 package rebue.rep.ctrl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.dao.DuplicateKeyException;
@@ -15,6 +17,7 @@ import com.github.pagehelper.PageInfo;
 
 import lombok.extern.slf4j.Slf4j;
 import rebue.rep.mo.RepRevenueAnnualMo;
+import rebue.rep.ro.RepRevenueRo;
 import rebue.rep.svc.RepRevenueAnnualSvc;
 import rebue.robotech.dic.ResultDic;
 import rebue.robotech.ro.IdRo;
@@ -173,5 +176,20 @@ public class RepRevenueAnnualCtrl {
     @PostMapping("/rep/revenue-annual/create-revenue-report")
     void createRevenueReportTask() {
         svc.createRevenueReportTask();
+    }
+    
+    
+    /**
+     * 根据店铺id和时间查询统计年报
+     * 
+     * @param shopId
+     * @param revenueTime
+     * @return
+     */
+    @GetMapping("rep/revenue-annual/list-revenue-of-year")
+    List<RepRevenueRo> listRevenueOfYear(@RequestParam("shopId") final java.lang.Long shopId,
+            @RequestParam("revenueStartTime") final java.lang.String revenueStartTime, @RequestParam("revenueEndTime") final java.lang.String revenueEndTime) {
+        log.info("根据店铺id和时间查询统计年报参数为shopId-{},-{},-{}", shopId, revenueStartTime,revenueEndTime);
+        return svc.listRevenueOfDay(shopId, revenueStartTime,revenueEndTime);
     }
 }
