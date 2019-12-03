@@ -71,28 +71,28 @@ public interface RepRevenueDailyMapper extends MybatisBaseMapper<RepRevenueDaily
     /**
      * 当年份不同的时候使用这个方法，如果能合并与下面的方法请合并
      * @param shopId
-     * @param revenueStaetYear
-     * @param revenueStaetDay
+     * @param revenueStartYear
+     * @param revenueStartDay
      * @param revenueEndYear
      * @param revenueEndDay
      * @return
      */
-    @Select("select * from REP_REVENUE_DAILY where  SHOP_ID  = #{shopId,jdbcType=TINYINT} and (YEAR =  #{revenueStaetYear}  and DAY_OF_YEAR >= #{revenueStaetDay} ) or ( YEAR =  #{revenueEndYear}  and DAY_OF_YEAR <=  #{revenueEndDay} )  order by YEAR ,DAY_OF_YEAR  ")
+    @Select("select * from REP_REVENUE_DAILY where  SHOP_ID  = #{shopId,jdbcType=TINYINT} and (YEAR =  #{revenueStartYear}  and DAY_OF_YEAR >= #{revenueStartDay} ) or ( YEAR =  #{revenueEndYear}  and DAY_OF_YEAR <=  #{revenueEndDay} )  order by YEAR ,DAY_OF_YEAR  ")
     List<RepRevenueDailyMo> selectRevenueOfDay1(@Param("shopId") long shopId,
-            @Param("revenueStaetYear") Integer revenueStaetYear, @Param("revenueStaetDay") Integer revenueStaetDay,
+            @Param("revenueStartYear") Integer revenueStartYear, @Param("revenueStartDay") Integer revenueStartDay,
             @Param("revenueEndYear") Integer revenueEndYear, @Param("revenueEndDay") Integer revenueEndDay);
 
     /**
      * 当年份相同的时候使用这个方法，如果能合并与上面的方法请合并
      * @param shopId
-     * @param revenueStaetYear
-     * @param revenueStaetDay
+     * @param revenueStartYear
+     * @param revenueStartDay
      * @param revenueEndYear
      * @param revenueEndDay
      * @return
      */
-    @Select("select * from REP_REVENUE_DAILY where  SHOP_ID  = #{shopId,jdbcType=TINYINT} and (YEAR =  #{revenueStaetYear}  and DAY_OF_YEAR >= #{revenueStaetDay} ) and ( YEAR =  #{revenueEndYear}  and DAY_OF_YEAR <=  #{revenueEndDay} )  order by YEAR ,DAY_OF_YEAR  ")
+    @Select("select * from REP_REVENUE_DAILY where  SHOP_ID  = #{shopId,jdbcType=TINYINT} and (YEAR =  #{revenueStartYear}  and DAY_OF_YEAR >= #{revenueStartDay} ) and ( YEAR =  #{revenueEndYear}  and DAY_OF_YEAR <=  #{revenueEndDay} )  order by YEAR ,DAY_OF_YEAR  ")
     List<RepRevenueDailyMo> selectRevenueOfDay2(@Param("shopId") long shopId,
-            @Param("revenueStaetYear") Integer revenueStaetYear, @Param("revenueStaetDay") Integer revenueStaetDay,
+            @Param("revenueStartYear") Integer revenueStartYear, @Param("revenueStartDay") Integer revenueStartDay,
             @Param("revenueEndYear") Integer revenueEndYear, @Param("revenueEndDay") Integer revenueEndDay);
 }

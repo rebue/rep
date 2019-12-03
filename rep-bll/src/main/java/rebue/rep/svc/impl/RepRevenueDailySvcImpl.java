@@ -357,22 +357,22 @@ public class RepRevenueDailySvcImpl extends
             revenueStartDate = formatter.parse(revenueStartTime);
             revenueEndDate = formatter.parse(revenueEndTime);
             calendar.setTime(revenueStartDate);
-            int revenueStaetDay = calendar.get(Calendar.DAY_OF_YEAR);
-            int revenueStaetYear = Integer.parseInt(revenueStartTime.substring(0, 4));
-            log.info("查询开始年是{}的第{}天的营收记录", revenueStaetYear, revenueStaetDay);
+            int revenueStartDay = calendar.get(Calendar.DAY_OF_YEAR);
+            int revenueStartYear = Integer.parseInt(revenueStartTime.substring(0, 4));
+            log.info("查询开始年是{}的第{}天的营收记录", revenueStartYear, revenueStartDay);
             calendar.setTime(revenueEndDate);
             int revenueEndDay = calendar.get(Calendar.DAY_OF_YEAR);
             int revenueEndYear = Integer.parseInt(revenueEndTime.substring(0, 4));
             log.info("查询结束年是{}的第{}天的营收记录", revenueEndYear, revenueEndDay);
-            log.info("查询日报的营收记录参数为{},{},{},{},{}", shopId, revenueStaetYear, revenueStaetDay, revenueEndYear,
+            log.info("查询日报的营收记录参数为{},{},{},{},{}", shopId, revenueStartYear, revenueStartDay, revenueEndYear,
                     revenueEndDay);
             List<RepRevenueDailyMo> dayRevenueResult = new ArrayList<>();
-            if (revenueStaetYear != revenueEndYear) {
-                dayRevenueResult = _mapper.selectRevenueOfDay1(shopId, revenueStaetYear, revenueStaetDay,
+            if (revenueStartYear != revenueEndYear) {
+                dayRevenueResult = _mapper.selectRevenueOfDay1(shopId, revenueStartYear, revenueStartDay,
                         revenueEndYear, revenueEndDay);
                 log.info("查询日报的营收记录结果为{}", dayRevenueResult);
             } else {
-                dayRevenueResult = _mapper.selectRevenueOfDay2(shopId, revenueStaetYear, revenueStaetDay,
+                dayRevenueResult = _mapper.selectRevenueOfDay2(shopId, revenueStartYear, revenueStartDay,
                         revenueEndYear, revenueEndDay);
                 log.info("查询日报的营收记录结果为{}", dayRevenueResult);
             }

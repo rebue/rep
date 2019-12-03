@@ -1,6 +1,9 @@
 package rebue.rep.ctrl;
 
 import com.github.pagehelper.PageInfo;
+
+import java.util.List;
+
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import rebue.rep.mo.RepRevenueMonthlyMo;
+import rebue.rep.ro.RepRevenueRo;
 import rebue.rep.svc.RepRevenueMonthlySvc;
 import rebue.robotech.dic.ResultDic;
 import rebue.robotech.ro.IdRo;
@@ -160,5 +164,20 @@ public class RepRevenueMonthlyCtrl {
         log.info("received get:/rep/revenue-monthly/get-by-id");
         log.info("revenueMonthlyCtrl.getById: {}", id);
         return svc.getById(id);
+    }
+    
+    
+    /**
+     * 根据店铺id和时间查询统计月报
+     * 
+     * @param shopId
+     * @param revenueTime
+     * @return
+     */
+    @GetMapping("rep/revenue-monthly/list-revenue-of-month")
+    List<RepRevenueRo> listRevenueOfMonth(@RequestParam("shopId") final java.lang.Long shopId,
+            @RequestParam("revenueStartTime") final java.lang.String revenueStartTime, @RequestParam("revenueEndTime") final java.lang.String revenueEndTime) {
+        log.info("根据店铺id和时间查询统计月报参数为shopId-{},-{},-{}", shopId, revenueStartTime,revenueEndTime);
+        return svc.listRevenueOfDay(shopId, revenueStartTime,revenueEndTime);
     }
 }

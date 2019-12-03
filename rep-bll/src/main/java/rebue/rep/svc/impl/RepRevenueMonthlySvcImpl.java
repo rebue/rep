@@ -1,13 +1,23 @@
 package rebue.rep.svc.impl;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import rebue.rep.dao.RepRevenueMonthlyDao;
 import rebue.rep.jo.RepRevenueMonthlyJo;
 import rebue.rep.mapper.RepRevenueMonthlyMapper;
+import rebue.rep.mo.RepRevenueDailyMo;
 import rebue.rep.mo.RepRevenueMonthlyMo;
+import rebue.rep.ro.RepRevenueRo;
 import rebue.rep.svc.RepRevenueMonthlySvc;
 import rebue.robotech.svc.impl.BaseSvcImpl;
 
@@ -28,7 +38,9 @@ import rebue.robotech.svc.impl.BaseSvcImpl;
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 @Service
 @Slf4j
-public class RepRevenueMonthlySvcImpl extends BaseSvcImpl<java.lang.Long, RepRevenueMonthlyJo, RepRevenueMonthlyDao, RepRevenueMonthlyMo, RepRevenueMonthlyMapper> implements RepRevenueMonthlySvc {
+public class RepRevenueMonthlySvcImpl extends
+        BaseSvcImpl<java.lang.Long, RepRevenueMonthlyJo, RepRevenueMonthlyDao, RepRevenueMonthlyMo, RepRevenueMonthlyMapper>
+        implements RepRevenueMonthlySvc {
 
     /**
      * @mbg.generated 自动生成，如需修改，请删除本行
@@ -43,4 +55,51 @@ public class RepRevenueMonthlySvcImpl extends BaseSvcImpl<java.lang.Long, RepRev
         }
         return super.add(mo);
     }
+
+    @Override
+    public List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime) {
+        List<RepRevenueRo> result = new ArrayList<RepRevenueRo>();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+         
+            int revenueStartMonth = Integer.parseInt(revenueStartTime.substring(5, 7));
+            int revenueStartYear = Integer.parseInt(revenueStartTime.substring(0, 4));
+            log.info("查询开始年是{}的第{}月的营收记录", revenueStartYear, revenueStartMonth);
+           
+            int revenueEndMonth = Integer.parseInt(revenueEndTime.substring(5, 7));
+            int revenueEndYear = Integer.parseInt(revenueEndTime.substring(0, 4));
+            log.info("查询结束年是{}的第{}月的营收记录", revenueEndYear, revenueEndMonth);
+            log.info("查询日报的营收记录参数为{},{},{},{},{}", shopId, revenueStartYear, revenueStartMonth, revenueEndYear,
+                    revenueEndMonth);
+            List<RepRevenueDailyMo> dayRevenueResult = new ArrayList<>();
+            if (revenueStartYear != revenueEndYear) {
+                dayRevenueResult = _mapper.selectRevenueOfMonth1(shopId, revenueStartYear, revenueStartMonth,
+                        revenueEndYear, revenueEndMonth);
+                log.info("查询月报的营收记录结果为{}", dayRevenueResult);
+            } else {
+                dayRevenueResult = _mapper.selectRevenueOfMonth2(shopId, revenueStartYear, revenueStartMonth,
+                        revenueEndYear, revenueEndMonth);
+                log.info("查询月报的营收记录结果为{}", dayRevenueResult);
+            }
+            // 计算开始时间
+            Calendar calendarGetStartDay = Calendar.getInstance();
+            calendarGetStartDay.setTime(formatter.parse(revenueStartTime));
+            log.info("开始时间-{}", formatter.format(calendarGetStartDay.getTime()));
+            for (RepRevenueDailyMo item : dayRevenueResult) {
+                RepRevenueRo revenueRo = new RepRevenueRo();
+                Date Date = calendarGetStartDay.getTime();
+                log.info("营收时间为-{}", formatter.format(Date));
+                revenueRo.setRevenueTime(formatter.format(Date));
+                revenueRo.setTotal(item.getTurnover());
+                result.add(revenueRo);
+                calendarGetStartDay.add(Calendar.MONTH, 1);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        log.info("即将返回的结果-{}", result);
+        return result;
+    }
+
 }

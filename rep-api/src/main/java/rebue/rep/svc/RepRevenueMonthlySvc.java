@@ -1,7 +1,10 @@
 package rebue.rep.svc;
 
+import java.util.List;
+
 import rebue.rep.jo.RepRevenueMonthlyJo;
 import rebue.rep.mo.RepRevenueMonthlyMo;
+import rebue.rep.ro.RepRevenueRo;
 import rebue.robotech.svc.BaseSvc;
 
 /**
@@ -10,4 +13,6 @@ import rebue.robotech.svc.BaseSvc;
  * @mbg.generated 自动生成的注释，如需修改本注释，请删除本行
  */
 public interface RepRevenueMonthlySvc extends BaseSvc<java.lang.Long, RepRevenueMonthlyMo, RepRevenueMonthlyJo> {
+
+    List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime);
 }
