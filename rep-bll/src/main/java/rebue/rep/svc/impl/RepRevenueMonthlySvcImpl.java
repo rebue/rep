@@ -71,7 +71,7 @@ public class RepRevenueMonthlySvcImpl extends
             log.info("查询结束年是{}的第{}月的营收记录", revenueEndYear, revenueEndMonth);
             log.info("查询日报的营收记录参数为{},{},{},{},{}", shopId, revenueStartYear, revenueStartMonth, revenueEndYear,
                     revenueEndMonth);
-            List<RepRevenueDailyMo> dayRevenueResult = new ArrayList<>();
+            List<RepRevenueMonthlyMo> dayRevenueResult = new ArrayList<>();
             if (revenueStartYear != revenueEndYear) {
                 dayRevenueResult = _mapper.selectRevenueOfMonth1(shopId, revenueStartYear, revenueStartMonth,
                         revenueEndYear, revenueEndMonth);
@@ -85,7 +85,7 @@ public class RepRevenueMonthlySvcImpl extends
             Calendar calendarGetStartDay = Calendar.getInstance();
             calendarGetStartDay.setTime(formatter.parse(revenueStartTime));
             log.info("开始时间-{}", formatter.format(calendarGetStartDay.getTime()));
-            for (RepRevenueDailyMo item : dayRevenueResult) {
+            for (RepRevenueMonthlyMo item : dayRevenueResult) {
                 RepRevenueRo revenueRo = new RepRevenueRo();
                 Date Date = calendarGetStartDay.getTime();
                 log.info("营收时间为-{}", formatter.format(Date));

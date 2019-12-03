@@ -165,7 +165,7 @@ public class RepRevenueAnnualSvcImpl extends
             int revenueEndYear = Integer.parseInt(revenueEndTime.substring(0, 4));
             log.info("查询结束年是{}营收记录", revenueEndYear);
             log.info("查询年报的营收记录参数为{},{},{}", shopId, revenueStartYear, revenueEndYear);
-            List<RepRevenueDailyMo> revenueResult = new ArrayList<>();
+            List<RepRevenueAnnualMo> revenueResult = new ArrayList<>();
             revenueResult = _mapper.selectRevenueOfYear(shopId, revenueStartYear, revenueEndYear);
             log.info("查询年报的营收记录结果为{}", revenueResult);
 
@@ -173,7 +173,7 @@ public class RepRevenueAnnualSvcImpl extends
             Calendar calendarGetStartDay = Calendar.getInstance();
             calendarGetStartDay.setTime(formatter.parse(revenueStartTime));
             log.info("开始时间-{}", formatter.format(calendarGetStartDay.getTime()));
-            for (RepRevenueDailyMo item : revenueResult) {
+            for (RepRevenueAnnualMo item : revenueResult) {
                 RepRevenueRo revenueRo = new RepRevenueRo();
                 Date Date = calendarGetStartDay.getTime();
                 log.info("营收时间为-{}", formatter.format(Date));

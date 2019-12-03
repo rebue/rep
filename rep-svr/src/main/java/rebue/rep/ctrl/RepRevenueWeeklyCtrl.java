@@ -1,6 +1,9 @@
 package rebue.rep.ctrl;
 
 import com.github.pagehelper.PageInfo;
+
+import java.util.List;
+
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import rebue.rep.mo.RepRevenueWeeklyMo;
+import rebue.rep.ro.RepRevenueRo;
 import rebue.rep.svc.RepRevenueWeeklySvc;
 import rebue.robotech.dic.ResultDic;
 import rebue.robotech.ro.IdRo;
@@ -160,5 +164,20 @@ public class RepRevenueWeeklyCtrl {
         log.info("received get:/rep/revenue-weekly/get-by-id");
         log.info("revenueWeeklyCtrl.getById: {}", id);
         return svc.getById(id);
+    }
+    
+    
+    /**
+     * 根据店铺id和时间查询统计日报
+     * 
+     * @param shopId
+     * @param revenueTime
+     * @return
+     */
+    @GetMapping("rep/revenue-weekly/list-revenue-of-week")
+    List<RepRevenueRo> listRevenueOfWeek(@RequestParam("shopId") final java.lang.Long shopId,
+            @RequestParam("revenueTime") final java.lang.String revenueTime) {
+        log.info("根据店铺id和时间查询统计周报参数为shopId-{},revenueTime-{}", shopId, revenueTime);
+        return svc.listRevenueOfWeek(shopId, revenueTime);
     }
 }

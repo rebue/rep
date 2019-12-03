@@ -2,9 +2,15 @@ package rebue.rep.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.expression.ParseException;
+
 import rebue.rep.mo.RepRevenueWeeklyMo;
 import rebue.robotech.dic.ResultDic;
 import rebue.robotech.ro.IdRo;
@@ -35,7 +41,7 @@ public class RepRevenueWeeklyTests {
      *
      * @mbg.generated 自动生成，如需修改，请删除本行
      */
-    @Test
+  //  @Test
     public void testCrud() throws IOException, ReflectiveOperationException {
         RepRevenueWeeklyMo mo = null;
         for (int i = 0; i < 20; i++) {
@@ -66,5 +72,29 @@ public class RepRevenueWeeklyTests {
         final Ro deleteRo = _objectMapper.readValue(deleteResult, Ro.class);
         log.info(deleteRo.toString());
         Assertions.assertEquals(ResultDic.SUCCESS, deleteRo.getResult());
+    }
+    
+    
+    @Test
+    public void method_2() throws java.text.ParseException {
+        // 创建Calendar对象
+        Calendar calendar = Calendar.getInstance();
+        // 定义输入时间的格式
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        // 从键盘上获取时间
+        String date = "2019-04-17";
+        try {
+            // 将输入的时间转化为Date对象
+            Date date2 = format.parse(date);
+            // 将Date对象传给calendar
+            calendar.setTime(date2);
+            // 获取它在这 一年中是第第几周
+            System.out.println(calendar.get(Calendar.WEEK_OF_YEAR));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }
