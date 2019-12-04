@@ -17,12 +17,11 @@ public class RevenueReportTasks {
     @Resource
     private RevenueReportSvc revenueReportSvc;
 
-    @Scheduled(fixedDelayString = "${rep.scheduler.createRevenueReportTask:20000}")
+    @Scheduled(cron = "${rep.scheduler.createRevenueReportTask:0 0 1 * * ?}")
     public void executeTasks() throws InterruptedException {
         _log.info("定时执行创建营收报表的任务");
 
         try {
-            Thread.sleep(5000);
             revenueReportSvc.createRevenueReportTask();
         } catch (final RuntimeException e) {
             _log.info("定时执行创建营收报表出现异常", e);

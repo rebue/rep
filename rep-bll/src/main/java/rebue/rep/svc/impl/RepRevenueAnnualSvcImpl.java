@@ -100,7 +100,7 @@ public class RepRevenueAnnualSvcImpl extends
             log.info("查询今年报表是否已经创建参数为-{}", mo);
             if (super.getOne(mo) != null) {
                 log.info("今年报表已经创建-{}", mo.getYear());
-                return;
+                continue;
             }
             // 创建年报
             RepRevenueAnnualMo addAnnualMo = new RepRevenueAnnualMo();

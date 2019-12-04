@@ -76,7 +76,7 @@ public class RepRevenueDailyTests {
         Assertions.assertEquals(ResultDic.SUCCESS, deleteRo.getResult());
     }
 
-    // @Test
+     @Test
     public void modifyRevenue() throws IOException {
         log.info("测试支付完成通知");
         PayDoneMsg payDoneMsg = new PayDoneMsg();
@@ -93,7 +93,7 @@ public class RepRevenueDailyTests {
      * 
      * @throws java.text.ParseException
      */
-     @Test
+    // @Test
     public void method_2() throws java.text.ParseException {
         // 创建Calendar对象
         Calendar calendar = Calendar.getInstance();
