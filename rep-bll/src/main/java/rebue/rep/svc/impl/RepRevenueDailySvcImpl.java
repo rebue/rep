@@ -159,7 +159,7 @@ public class RepRevenueDailySvcImpl extends
         dailyMo.setDayOfYear(ca.get(Calendar.DAY_OF_YEAR));
         dailyMo.setYear(ca.get(Calendar.YEAR));
         dailyMo.setShopId(orderList.get(0).getShopId());
-        RepRevenueDailyMo dailyResult = getOrCreatDaily(dailyMo);
+        RepRevenueDailyMo dailyResult = super.getOne(dailyMo);
         if (dailyResult == null) {
             throw new RuntimeException("获取当天营收记录失败");
         }
@@ -186,7 +186,7 @@ public class RepRevenueDailySvcImpl extends
         }
         weekMoly.setYear(ca.get(Calendar.YEAR));
         weekMoly.setShopId(orderList.get(0).getShopId());
-        RepRevenueWeeklyMo weeklyResult = getOrCreatWeekly(weekMoly);
+        RepRevenueWeeklyMo weeklyResult = repRevenueWeeklySvc.getOne(weekMoly);
         if (weeklyResult == null) {
             throw new RuntimeException("获取当周营收记录失败");
         }
@@ -209,7 +209,7 @@ public class RepRevenueDailySvcImpl extends
         Monthly.setYear(ca.get(Calendar.YEAR));
         Monthly.setShopId(orderList.get(0).getShopId());
 
-        RepRevenueMonthlyMo monthlyResult = getOrCreatDaily(Monthly);
+        RepRevenueMonthlyMo monthlyResult = repRevenueMonthlySvc.getOne(Monthly);
         if (monthlyResult == null) {
             throw new RuntimeException("获取当月营收记录失败");
         }
@@ -230,7 +230,7 @@ public class RepRevenueDailySvcImpl extends
         RepRevenueAnnualMo annual = new RepRevenueAnnualMo();
         annual.setYear(ca.get(Calendar.YEAR));
         annual.setShopId(orderList.get(0).getShopId());
-        RepRevenueAnnualMo annualResult = getOrCreatDaily(annual);
+        RepRevenueAnnualMo annualResult = repRevenueAnnualSvc.getOne(annual);
 
         if (annualResult == null) {
             throw new RuntimeException("获取当年营收记录失败");
@@ -258,92 +258,6 @@ public class RepRevenueDailySvcImpl extends
         return null;
     }
 
-    private RepRevenueDailyMo getOrCreatDaily(RepRevenueDailyMo mo) {
-        log.info("查询或创建并返回日报的参数为-{}", mo);
-        RepRevenueDailyMo result = super.getOne(mo);
-        log.info("查询或创建并返回日报的结果为-{}", result);
-        if (result != null) {
-            return result;
-        }
-        log.info("记录不存在，创建记录并返回");
-        mo.setModifiedTimestamp(new Date().getTime());
-        mo.setProfit(new BigDecimal("0"));
-        mo.setTurnover(new BigDecimal("0"));
-        mo.setCost(new BigDecimal("0"));
-        mo.setOrderNumber(0l);
-        try {
-            add(mo);
-        } catch (Exception e) {
-            throw new RuntimeException("创建今天营收记录失败");
-        }
-        return mo;
-    }
-
-    private RepRevenueWeeklyMo getOrCreatWeekly(RepRevenueWeeklyMo mo) {
-        log.info("查询或创建并返回周报的参数为-{}", mo);
-        RepRevenueWeeklyMo result = repRevenueWeeklySvc.getOne(mo);
-        log.info("查询或创建并返回周报的结果为-{}", result);
-        if (result != null) {
-            return result;
-        }
-        log.info("记录不存在，创建记录并返回");
-        mo.setModifiedTimestamp(new Date().getTime());
-        mo.setProfit(new BigDecimal("0"));
-        mo.setTurnover(new BigDecimal("0"));
-        mo.setCost(new BigDecimal("0"));
-        mo.setOrderNumber(0l);
-
-        try {
-            repRevenueWeeklySvc.add(mo);
-        } catch (Exception e) {
-            throw new RuntimeException("创建今天营收记录失败");
-        }
-        return mo;
-    }
-
-    private RepRevenueMonthlyMo getOrCreatDaily(RepRevenueMonthlyMo mo) {
-        log.info("查询或创建并返回月报的参数为-{}", mo);
-        RepRevenueMonthlyMo result = repRevenueMonthlySvc.getOne(mo);
-        log.info("查询或创建并返回月报的结果为-{}", result);
-        if (result != null) {
-            return result;
-        }
-        log.info("记录不存在，创建记录并返回");
-        mo.setModifiedTimestamp(new Date().getTime());
-        mo.setProfit(new BigDecimal("0"));
-        mo.setTurnover(new BigDecimal("0"));
-        mo.setCost(new BigDecimal("0"));
-        mo.setOrderNumber(0l);
-
-        try {
-            repRevenueMonthlySvc.add(mo);
-        } catch (Exception e) {
-            throw new RuntimeException("创建今月营收记录失败");
-        }
-        return mo;
-    }
-
-    private RepRevenueAnnualMo getOrCreatDaily(RepRevenueAnnualMo mo) {
-        log.info("查询或创建并返回日报的参数为-{}", mo);
-        RepRevenueAnnualMo result = repRevenueAnnualSvc.getOne(mo);
-        log.info("查询或创建并返回日报的结果为-{}", result);
-        if (result != null) {
-            return result;
-        }
-        log.info("记录不存在，创建记录并返回");
-        mo.setModifiedTimestamp(new Date().getTime());
-        mo.setProfit(new BigDecimal("0"));
-        mo.setTurnover(new BigDecimal("0"));
-        mo.setCost(new BigDecimal("0"));
-        mo.setOrderNumber(0l);
-
-        try {
-            repRevenueAnnualSvc.add(mo);
-        } catch (Exception e) {
-            throw new RuntimeException("创建今年营收记录失败");
-        }
-        return mo;
-    }
 
     @Override
     public List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime) {
