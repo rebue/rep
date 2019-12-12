@@ -36,7 +36,7 @@ public class RepRevenueOrderSvcImpl extends BaseSvcImpl<java.lang.Long, RepReven
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public int add(RepRevenueOrderMo mo) {
-        log.info("repRevenueOrderSvc.add: 添加营收报表订单记录 mo-", mo);
+        log.info("repRevenueOrderSvc.add: 添加营收报表订单记录 mo-{}", mo);
         // 如果id为空那么自动生成分布式id
         if (mo.getId() == null || mo.getId() == 0) {
             mo.setId(_idWorker.getId());

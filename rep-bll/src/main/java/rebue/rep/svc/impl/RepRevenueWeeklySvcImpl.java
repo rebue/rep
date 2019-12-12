@@ -49,7 +49,7 @@ public class RepRevenueWeeklySvcImpl extends
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public int add(RepRevenueWeeklyMo mo) {
-        log.info("repRevenueWeeklySvc.add: 添加报表-营收报表-周报 mo-", mo);
+        log.info("repRevenueWeeklySvc.add: 添加报表-营收报表-周报 mo-{}", mo);
         // 如果id为空那么自动生成分布式id
         if (mo.getId() == null || mo.getId() == 0) {
             mo.setId(_idWorker.getId());

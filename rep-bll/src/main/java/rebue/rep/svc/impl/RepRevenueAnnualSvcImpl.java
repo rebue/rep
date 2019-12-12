@@ -57,7 +57,7 @@ public class RepRevenueAnnualSvcImpl extends
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public int add(RepRevenueAnnualMo mo) {
-        log.info("repRevenueAnnualSvc.add: 添加报表-营收报表--年报 mo-", mo);
+        log.info("repRevenueAnnualSvc.add: 添加报表-营收报表--年报 mo-{}", mo);
         // 如果id为空那么自动生成分布式id
         if (mo.getId() == null || mo.getId() == 0) {
             mo.setId(_idWorker.getId());
