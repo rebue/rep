@@ -83,6 +83,13 @@ public class RepRevenueAnnualSvcImpl extends
      */
     @Override
     public void createRevenueReportTask() {
+        
+        // 这里休眠是为了消息通知过来可能店铺那边还没有插入新的店铺数据导致找不到数据
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
         // 获取所有店铺
         List<SlrShopMo> list = slrShopSvc.listAll();
         log.info("获取所有店铺的返回值为-{}", list);
