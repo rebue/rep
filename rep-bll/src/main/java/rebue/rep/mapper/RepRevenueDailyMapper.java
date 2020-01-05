@@ -77,7 +77,7 @@ public interface RepRevenueDailyMapper extends MybatisBaseMapper<RepRevenueDaily
      * @param revenueEndDay
      * @return
      */
-    @Select("select * from REP_REVENUE_DAILY where  SHOP_ID  = #{shopId,jdbcType=TINYINT} and (YEAR =  #{revenueStartYear}  and DAY_OF_YEAR >= #{revenueStartDay} ) or ( YEAR =  #{revenueEndYear}  and DAY_OF_YEAR <=  #{revenueEndDay} )  order by YEAR ,DAY_OF_YEAR  ")
+    @Select("select * from REP_REVENUE_DAILY where  SHOP_ID  = #{shopId,jdbcType=TINYINT} and ((YEAR =  #{revenueStartYear}  and DAY_OF_YEAR >= #{revenueStartDay} ) or ( YEAR =  #{revenueEndYear}  and DAY_OF_YEAR <=  #{revenueEndDay} ))  order by YEAR ,DAY_OF_YEAR  ")
     List<RepRevenueDailyMo> selectRevenueOfDay1(@Param("shopId") long shopId,
             @Param("revenueStartYear") Integer revenueStartYear, @Param("revenueStartDay") Integer revenueStartDay,
             @Param("revenueEndYear") Integer revenueEndYear, @Param("revenueEndDay") Integer revenueEndDay);
