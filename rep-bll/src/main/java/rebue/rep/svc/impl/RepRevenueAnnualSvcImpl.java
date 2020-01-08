@@ -26,6 +26,9 @@ import rebue.rep.svc.RepRevenueAnnualSvc;
 import rebue.rep.svc.RepRevenueDailySvc;
 import rebue.rep.svc.RepRevenueMonthlySvc;
 import rebue.rep.svc.RepRevenueWeeklySvc;
+import rebue.rep.to.ReturnTurnoverTo;
+import rebue.robotech.dic.ResultDic;
+import rebue.robotech.ro.Ro;
 import rebue.robotech.svc.impl.BaseSvcImpl;
 import rebue.slr.mo.SlrShopMo;
 import rebue.slr.svr.feign.SlrShopSvc;
@@ -83,7 +86,7 @@ public class RepRevenueAnnualSvcImpl extends
      */
     @Override
     public void createRevenueReportTask() {
-        
+
         // 这里休眠是为了消息通知过来可能店铺那边还没有插入新的店铺数据导致找不到数据
         try {
             Thread.sleep(1000);
@@ -161,7 +164,7 @@ public class RepRevenueAnnualSvcImpl extends
 
         }
     }
-    
+
     @Override
     public List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime) {
         List<RepRevenueRo> result = new ArrayList<RepRevenueRo>();
@@ -194,6 +197,19 @@ public class RepRevenueAnnualSvcImpl extends
             e.printStackTrace();
         }
         log.info("即将返回的结果-{}", result);
+        return result;
+    }
+
+    /**
+     * 按顺序减去年月周日的营收记录
+     */
+    @Override
+    public Ro returnTurnover(ReturnTurnoverTo returnTurnoverTo) {
+        Ro result = new Ro();
+        
+        log.info("同意退款修改营收报表成功");
+        result.setMsg("修改营收报表成功");
+        result.setResult(ResultDic.SUCCESS);
         return result;
     }
 

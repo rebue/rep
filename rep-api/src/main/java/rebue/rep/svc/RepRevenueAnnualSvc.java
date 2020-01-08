@@ -5,6 +5,8 @@ import java.util.List;
 import rebue.rep.jo.RepRevenueAnnualJo;
 import rebue.rep.mo.RepRevenueAnnualMo;
 import rebue.rep.ro.RepRevenueRo;
+import rebue.rep.to.ReturnTurnoverTo;
+import rebue.robotech.ro.Ro;
 import rebue.robotech.svc.BaseSvc;
 
 /**
@@ -17,4 +19,6 @@ public interface RepRevenueAnnualSvc extends BaseSvc<java.lang.Long, RepRevenueA
     void createRevenueReportTask();
 
     List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime);
+
+    Ro returnTurnover(ReturnTurnoverTo returnTurnoverTo);
 }

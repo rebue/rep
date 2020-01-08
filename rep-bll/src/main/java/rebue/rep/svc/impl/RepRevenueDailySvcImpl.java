@@ -38,7 +38,10 @@ import rebue.rep.svc.RepRevenueDailySvc;
 import rebue.rep.svc.RepRevenueMonthlySvc;
 import rebue.rep.svc.RepRevenueOrderSvc;
 import rebue.rep.svc.RepRevenueWeeklySvc;
+import rebue.rep.to.ReturnTurnoverTo;
 import rebue.rep.to.UpdateTurnoverTo;
+import rebue.robotech.dic.ResultDic;
+import rebue.robotech.ro.Ro;
 import rebue.robotech.svc.impl.BaseSvcImpl;
 
 /**
@@ -258,7 +261,6 @@ public class RepRevenueDailySvcImpl extends
         return null;
     }
 
-
     @Override
     public List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime) {
         List<RepRevenueRo> result = new ArrayList<RepRevenueRo>();
@@ -308,6 +310,117 @@ public class RepRevenueDailySvcImpl extends
             e.printStackTrace();
         }
         log.info("即将返回的结果-{}", result);
+        return result;
+    }
+
+    /**
+     * 同意退款修改营收记录
+     */
+    @Override
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    public Ro returnTurnover(ReturnTurnoverTo returnTurnoverTo) {
+        Ro result = new Ro();
+        // 将营收改为负数
+        returnTurnoverTo.setRealMoney(returnTurnoverTo.getRealMoney().multiply(new BigDecimal("-1")));
+
+        // 更新营收记录
+        Calendar ca = Calendar.getInstance();
+        ca.setTime(new Date());
+        // 更新当天的营收记录
+        RepRevenueDailyMo dailyMo = new RepRevenueDailyMo();
+        dailyMo.setDayOfYear(ca.get(Calendar.DAY_OF_YEAR));
+        dailyMo.setYear(ca.get(Calendar.YEAR));
+        dailyMo.setShopId(returnTurnoverTo.getShopId());
+        RepRevenueDailyMo dailyResult = super.getOne(dailyMo);
+        if (dailyResult == null) {
+            throw new RuntimeException("获取当天营收记录失败");
+        }
+        UpdateTurnoverTo updateDayTurnoverTo = new UpdateTurnoverTo();
+        updateDayTurnoverTo.setId(dailyResult.getId());
+        updateDayTurnoverTo.setModifiedTimestamp(new Date().getTime());
+        updateDayTurnoverTo.setNewTurnover(dailyResult.getTurnover().add(returnTurnoverTo.getRealMoney()));
+        updateDayTurnoverTo.setOldTurnover(dailyResult.getTurnover());
+        updateDayTurnoverTo.setNewOrderNumber(dailyResult.getOrderNumber() - 1);
+        updateDayTurnoverTo.setNewCost(dailyResult.getCost().add(returnTurnoverTo.getRealMoney()));
+        updateDayTurnoverTo.setNewProfit(dailyResult.getProfit().add(returnTurnoverTo.getRealMoney()));
+        log.info("更新当天营收记录的参数为updateDayTurnoverTo-{}", updateDayTurnoverTo);
+        if (_mapper.updateDayTurnover(updateDayTurnoverTo) != 1) {
+            throw new RuntimeException("更新当天营收记录失败");
+
+        }
+
+        // 更新当周的营收记录(因为如果那个星期是跨年的，那么使用(Calendar.WEEK_OF_YEAR将会有问题，所以周数使用以下方法计算)
+        RepRevenueWeeklyMo weekMoly = new RepRevenueWeeklyMo();
+        if (ca.get(Calendar.WEEK_OF_YEAR) == 1 && ca.get(Calendar.MONTH) + 1 == 12) {
+            weekMoly.setWeekOfYear(53);// 取53是因为任务插入记录的时候每一年都插了53周
+        } else {
+            weekMoly.setWeekOfYear(ca.get(Calendar.WEEK_OF_YEAR));
+        }
+        weekMoly.setYear(ca.get(Calendar.YEAR));
+        weekMoly.setShopId(returnTurnoverTo.getShopId());
+        RepRevenueWeeklyMo weeklyResult = repRevenueWeeklySvc.getOne(weekMoly);
+        if (weeklyResult == null) {
+            throw new RuntimeException("获取当周营收记录失败");
+        }
+        UpdateTurnoverTo updateWeekTurnoverTo = new UpdateTurnoverTo();
+        updateWeekTurnoverTo.setId(weeklyResult.getId());
+        updateWeekTurnoverTo.setModifiedTimestamp(new Date().getTime());
+        updateWeekTurnoverTo.setNewTurnover(weeklyResult.getTurnover().add(returnTurnoverTo.getRealMoney()));
+        updateWeekTurnoverTo.setOldTurnover(weeklyResult.getTurnover());
+        updateWeekTurnoverTo.setNewOrderNumber(weeklyResult.getOrderNumber() - 1);
+        updateWeekTurnoverTo.setNewCost(weeklyResult.getCost().add(returnTurnoverTo.getRealMoney()));
+        updateWeekTurnoverTo.setNewProfit(weeklyResult.getProfit().add(returnTurnoverTo.getRealMoney()));
+        log.info("更新当周营收记录的参数为updateWeekTurnoverTo-{}", updateWeekTurnoverTo);
+        if (repRevenueWeeklyMapper.updateWeekTurnover(updateWeekTurnoverTo) != 1) {
+            throw new RuntimeException("更新当周营收记录失败");
+        }
+
+        // 更新当月营收记录
+        RepRevenueMonthlyMo Monthly = new RepRevenueMonthlyMo();
+        Monthly.setMonthOfYear(ca.get(Calendar.MONTH) + 1);
+        Monthly.setYear(ca.get(Calendar.YEAR));
+        Monthly.setShopId(returnTurnoverTo.getShopId());
+
+        RepRevenueMonthlyMo monthlyResult = repRevenueMonthlySvc.getOne(Monthly);
+        if (monthlyResult == null) {
+            throw new RuntimeException("获取当月营收记录失败");
+        }
+        UpdateTurnoverTo updateMonthTurnoverTo = new UpdateTurnoverTo();
+        updateMonthTurnoverTo.setId(monthlyResult.getId());
+        updateMonthTurnoverTo.setModifiedTimestamp(new Date().getTime());
+        updateMonthTurnoverTo.setNewTurnover(monthlyResult.getTurnover().add(returnTurnoverTo.getRealMoney()));
+        updateMonthTurnoverTo.setOldTurnover(monthlyResult.getTurnover());
+        updateMonthTurnoverTo.setNewOrderNumber(monthlyResult.getOrderNumber() - 1);
+        updateMonthTurnoverTo.setNewCost(monthlyResult.getCost().add(returnTurnoverTo.getRealMoney()));
+        updateMonthTurnoverTo.setNewProfit(monthlyResult.getProfit().add(returnTurnoverTo.getRealMoney()));
+        log.info("更新当月营收记录的参数为updateMonthTurnoverTo-{}", updateMonthTurnoverTo);
+        if (repRevenueMonthlyMapper.updateMonthTurnover(updateMonthTurnoverTo) != 1) {
+            throw new RuntimeException("更新当月营收记录失败");
+        }
+
+        // 更新当年营收记录
+        RepRevenueAnnualMo annual = new RepRevenueAnnualMo();
+        annual.setYear(ca.get(Calendar.YEAR));
+        annual.setShopId(returnTurnoverTo.getShopId());
+        RepRevenueAnnualMo annualResult = repRevenueAnnualSvc.getOne(annual);
+
+        if (annualResult == null) {
+            throw new RuntimeException("获取当年营收记录失败");
+        }
+        UpdateTurnoverTo updateYearTurnoverTo = new UpdateTurnoverTo();
+        updateYearTurnoverTo.setId(annualResult.getId());
+        updateYearTurnoverTo.setModifiedTimestamp(new Date().getTime());
+        updateYearTurnoverTo.setNewTurnover(annualResult.getTurnover().add(returnTurnoverTo.getRealMoney()));
+        updateYearTurnoverTo.setOldTurnover(annualResult.getTurnover());
+        updateYearTurnoverTo.setNewOrderNumber(annualResult.getOrderNumber() - 1);
+        updateYearTurnoverTo.setNewCost(annualResult.getCost().add(returnTurnoverTo.getRealMoney()));
+        updateYearTurnoverTo.setNewProfit(annualResult.getProfit().add(returnTurnoverTo.getRealMoney()));
+        log.info("更新年营收记录的参数为updateYearTurnoverTo-{}", updateYearTurnoverTo);
+        if (repRevenueAnnualMapper.updateYearTurnover(updateYearTurnoverTo) != 1) {
+            throw new RuntimeException("更新当年营收记录失败");
+        }
+        result.setMsg("更新营收记录成功");
+        result.setResult(ResultDic.SUCCESS);
         return result;
     }
 

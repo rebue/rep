@@ -19,6 +19,7 @@ import rebue.afc.msg.PayDoneMsg;
 import rebue.rep.mo.RepRevenueDailyMo;
 import rebue.rep.ro.RepRevenueRo;
 import rebue.rep.svc.RepRevenueDailySvc;
+import rebue.rep.to.ReturnTurnoverTo;
 import rebue.robotech.dic.ResultDic;
 import rebue.robotech.ro.IdRo;
 import rebue.robotech.ro.Ro;
@@ -193,6 +194,13 @@ public class RepRevenueDailyCtrl {
             @RequestParam("revenueStartTime") final java.lang.String revenueStartTime, @RequestParam("revenueEndTime") final java.lang.String revenueEndTime) {
         log.info("根据店铺id和时间查询统计日报参数为shopId-{},-{},-{}", shopId, revenueStartTime,revenueEndTime);
         return svc.listRevenueOfDay(shopId, revenueStartTime,revenueEndTime);
+    }
+    
+    
+    @PostMapping("/rep/revenue-daily/return-turnover")
+    Ro returnTurnover(@RequestBody final ReturnTurnoverTo returnTurnoverTo) {
+        log.info("同意退款退还营收报表参数为-{}", returnTurnoverTo);
+        return svc.returnTurnover(returnTurnoverTo);
     }
 
 }

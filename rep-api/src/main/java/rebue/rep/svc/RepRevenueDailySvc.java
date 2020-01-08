@@ -6,6 +6,8 @@ import rebue.afc.msg.PayDoneMsg;
 import rebue.rep.jo.RepRevenueDailyJo;
 import rebue.rep.mo.RepRevenueDailyMo;
 import rebue.rep.ro.RepRevenueRo;
+import rebue.rep.to.ReturnTurnoverTo;
+import rebue.robotech.ro.Ro;
 import rebue.robotech.svc.BaseSvc;
 
 /**
@@ -19,4 +21,7 @@ public interface RepRevenueDailySvc extends BaseSvc<java.lang.Long, RepRevenueDa
 
 
     List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime);
+
+
+    Ro returnTurnover(ReturnTurnoverTo returnTurnoverTo);
 }
