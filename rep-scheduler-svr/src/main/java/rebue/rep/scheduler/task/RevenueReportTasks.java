@@ -17,7 +17,8 @@ public class RevenueReportTasks {
     @Resource
     private RevenueReportSvc revenueReportSvc;
 
-    @Scheduled(cron = "${rep.scheduler.createRevenueReportTask:0 0 1 * * ?}")
+   // @Scheduled(cron = "${rep.scheduler.createRevenueReportTask:0 0 1 * * ?}")
+    @Scheduled(fixedDelayString = "${ord.scheduler.firstBuyFixedDelay:300000}")
     public void executeTasks() throws InterruptedException {
         _log.info("定时执行创建营收报表的任务");
 

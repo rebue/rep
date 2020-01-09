@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -71,8 +70,6 @@ public class RepRevenueAnnualTests {
         log.info(deleteRo.toString());
         Assertions.assertEquals(ResultDic.SUCCESS, deleteRo.getResult());
     }
-    
-    
 
     // @Test
     public void testDate() {
@@ -86,7 +83,6 @@ public class RepRevenueAnnualTests {
         System.out.println(ca.get(Calendar.MONTH) + 1);
         // 获取那一年
         System.out.println(ca.get(Calendar.YEAR));
-
         Calendar cale = null;
         cale = Calendar.getInstance();
         // 获取当月第一天和最后一天
@@ -105,16 +101,13 @@ public class RepRevenueAnnualTests {
         System.out.println("本月第一天和最后一天分别是 ： " + firstday + " and " + lastday);
     }
 
-  
-
     @Test
     public void testWeekCount() {
         Calendar ca = Calendar.getInstance();
         ca.setTime(new Date());
         double dayCount = (ca.get(Calendar.YEAR) % 400 == 0 && ca.get(Calendar.YEAR) % 100 == 0 ? 366 : 365);
-        int weekCout =(int)  Math.ceil(dayCount / 7);
+        int weekCout = (int) Math.ceil(dayCount / 7);
         System.out.println("天" + dayCount);
         System.out.println("周" + weekCout);
-
     }
 }

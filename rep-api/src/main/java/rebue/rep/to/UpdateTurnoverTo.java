@@ -16,13 +16,18 @@ public class UpdateTurnoverTo {
     private BigDecimal newTurnover;
 
     private BigDecimal oldTurnover;
-    
+
     private BigDecimal newCost;
-    
+
     private BigDecimal newProfit;
 
     private Long newOrderNumber;
-    
+
     private Long modifiedTimestamp;
+
+    private BigDecimal cash;
+    private BigDecimal wxpay;
+    private BigDecimal alipay;
+    private BigDecimal cashback;
 
 }

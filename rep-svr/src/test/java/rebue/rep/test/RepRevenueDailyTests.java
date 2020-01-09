@@ -6,12 +6,10 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.expression.ParseException;
-
 import rebue.afc.msg.PayDoneMsg;
 import rebue.rep.mo.RepRevenueDailyMo;
 import rebue.robotech.dic.ResultDic;
@@ -38,11 +36,6 @@ public class RepRevenueDailyTests {
      */
     private final ObjectMapper _objectMapper = new ObjectMapper();
 
-    /**
-     * 测试基本的增删改查
-     *
-     * @mbg.generated 自动生成，如需修改，请删除本行
-     */
     // @Test
     public void testCrud() throws IOException, ReflectiveOperationException {
         RepRevenueDailyMo mo = null;
@@ -76,7 +69,7 @@ public class RepRevenueDailyTests {
         Assertions.assertEquals(ResultDic.SUCCESS, deleteRo.getResult());
     }
 
-     @Test
+    @Test
     public void modifyRevenue() throws IOException {
         log.info("测试支付完成通知");
         PayDoneMsg payDoneMsg = new PayDoneMsg();
@@ -84,22 +77,15 @@ public class RepRevenueDailyTests {
         payDoneMsg.setOrderId("674482426814267404");
         payDoneMsg.setPayAmount(new BigDecimal("20"));
         payDoneMsg.setUserId(1l);
-
         OkhttpUtils.putByJsonParams(hostUrl + "/rep/revenue-daily/modify-revenue", payDoneMsg);
     }
 
-    /**
-     * 获取某一天是某一年中的第几天
-     * 
-     * @throws java.text.ParseException
-     */
     // @Test
     public void method_2() throws java.text.ParseException {
         // 创建Calendar对象
         Calendar calendar = Calendar.getInstance();
         // 定义输入时间的格式
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
         // 从键盘上获取时间
         String date = "2019-03-17";
         try {
@@ -112,35 +98,26 @@ public class RepRevenueDailyTests {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         Calendar calendar1 = Calendar.getInstance();
         calendar1.set(Calendar.DATE, 1);
         calendar1.roll(Calendar.DATE, -1);
         System.out.println(calendar1.getTimeInMillis());
-
         final Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         final int last = cal.getActualMinimum(Calendar.DAY_OF_YEAR);
         cal.set(Calendar.DAY_OF_YEAR, last);
         System.out.println("----------------");
-        
         String date1 = "2019-12-31";
         cal.setTime(format.parse(date1));
-        cal.add(Calendar.DAY_OF_YEAR,1);
+        cal.add(Calendar.DAY_OF_YEAR, 1);
         System.out.println(format.format(cal.getTime()));
-
     }
 
-  //  @Test
+    // @Test
     public void textRevenue() throws IOException {
-//        final String listResult = OkhttpUtils.get(hostUrl + "/rep/revenue-daily/list-revenue-of-Day?shopId="
-//                + 583124897568522240l + "&revenueTime=2019-11-25");
-
-        final String listResult = OkhttpUtils.get(hostUrl + "/rep/revenue-daily/list-revenue-of-Day?shopId="
-                + 583124897568522240l + "&revenueStartTime=2019-12-30" + "&revenueEndTime=2020-01-03");
-
+        // final String listResult = OkhttpUtils.get(hostUrl + "/rep/revenue-daily/list-revenue-of-Day?shopId="
+        // + 583124897568522240l + "&revenueTime=2019-11-25");
+        final String listResult = OkhttpUtils.get(hostUrl + "/rep/revenue-daily/list-revenue-of-Day?shopId=" + 583124897568522240l + "&revenueStartTime=2019-12-30" + "&revenueEndTime=2020-01-03");
         System.out.println(listResult);
-
     }
-
 }

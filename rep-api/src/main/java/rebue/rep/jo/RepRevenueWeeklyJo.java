@@ -110,6 +110,42 @@ public class RepRevenueWeeklyJo implements Serializable {
     private Long modifiedTimestamp;
 
     /**
+     * 现金支付
+     *
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @Basic(optional = false)
+    @Column(name = "CASH", nullable = false, precision = 20, scale = 4)
+    private BigDecimal cash;
+
+    /**
+     * 微信支付
+     *
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @Basic(optional = false)
+    @Column(name = "WXPAY", nullable = false, precision = 20, scale = 4)
+    private BigDecimal wxpay;
+
+    /**
+     * 支付宝支付
+     *
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @Basic(optional = false)
+    @Column(name = "ALIPAY", nullable = false, precision = 20, scale = 4)
+    private BigDecimal alipay;
+
+    /**
+     * 返现金支付
+     *
+     * @mbg.generated 自动生成，如需修改，请删除本行
+     */
+    @Basic(optional = false)
+    @Column(name = "CASHBACK", nullable = false, precision = 20, scale = 4)
+    private BigDecimal cashback;
+
+    /**
      * @mbg.generated 自动生成，如需修改，请删除本行
      */
     @Override

@@ -136,6 +136,26 @@ public class RepRevenueDailySvcImpl extends
             return null;
         }
 
+        // 初始化各个支付类型本次应该增加的金额
+        BigDecimal cash = BigDecimal.ZERO;
+        BigDecimal wxpay = BigDecimal.ZERO;
+        BigDecimal alipay = BigDecimal.ZERO;
+        BigDecimal cashback = BigDecimal.ZERO;
+        switch (orderList.get(0).getPayWay()) {
+        case 1:
+            cash = payDoneMsg.getPayAmount();
+            break;
+        case 2:
+            wxpay = payDoneMsg.getPayAmount();
+            break;
+        case 3:
+            alipay = payDoneMsg.getPayAmount();
+            break;
+        case 4:
+            cashback = payDoneMsg.getPayAmount();
+            break;
+        }
+
         // 获取订单详情计算成本和利润
         for (final OrdOrderMo order : orderList) {
             List<OrdOrderDetailMo> orderDetailList = ordOrderDetailSvc.listAll(order.getId());
@@ -174,6 +194,12 @@ public class RepRevenueDailySvcImpl extends
         updateDayTurnoverTo.setNewOrderNumber(dailyResult.getOrderNumber() + 1);
         updateDayTurnoverTo.setNewCost(dailyResult.getCost().add(costTitle));
         updateDayTurnoverTo.setNewProfit(dailyResult.getProfit().add(profitTitle));
+
+        updateDayTurnoverTo.setCash(dailyResult.getCash().add(cash));
+        updateDayTurnoverTo.setWxpay(dailyResult.getWxpay().add(wxpay));
+        updateDayTurnoverTo.setAlipay(dailyResult.getAlipay().add(alipay));
+        updateDayTurnoverTo.setCashback(dailyResult.getCashback().add(cashback));
+
         log.info("更新当天营收记录的参数为updateDayTurnoverTo-{}", updateDayTurnoverTo);
         if (_mapper.updateDayTurnover(updateDayTurnoverTo) != 1) {
             throw new RuntimeException("更新当天营收记录失败");
@@ -201,6 +227,12 @@ public class RepRevenueDailySvcImpl extends
         updateWeekTurnoverTo.setNewOrderNumber(weeklyResult.getOrderNumber() + 1);
         updateWeekTurnoverTo.setNewCost(weeklyResult.getCost().add(costTitle));
         updateWeekTurnoverTo.setNewProfit(weeklyResult.getProfit().add(profitTitle));
+
+        updateWeekTurnoverTo.setCash(weeklyResult.getCash().add(cash));
+        updateWeekTurnoverTo.setWxpay(weeklyResult.getWxpay().add(wxpay));
+        updateWeekTurnoverTo.setAlipay(weeklyResult.getAlipay().add(alipay));
+        updateWeekTurnoverTo.setCashback(weeklyResult.getCashback().add(cashback));
+
         log.info("更新当周营收记录的参数为updateWeekTurnoverTo-{}", updateWeekTurnoverTo);
         if (repRevenueWeeklyMapper.updateWeekTurnover(updateWeekTurnoverTo) != 1) {
             throw new RuntimeException("更新当周营收记录失败");
@@ -224,6 +256,12 @@ public class RepRevenueDailySvcImpl extends
         updateMonthTurnoverTo.setNewOrderNumber(monthlyResult.getOrderNumber() + 1);
         updateMonthTurnoverTo.setNewCost(monthlyResult.getCost().add(costTitle));
         updateMonthTurnoverTo.setNewProfit(monthlyResult.getProfit().add(profitTitle));
+
+        updateMonthTurnoverTo.setCash(monthlyResult.getCash().add(cash));
+        updateMonthTurnoverTo.setWxpay(monthlyResult.getWxpay().add(wxpay));
+        updateMonthTurnoverTo.setAlipay(monthlyResult.getAlipay().add(alipay));
+        updateMonthTurnoverTo.setCashback(monthlyResult.getCashback().add(cashback));
+
         log.info("更新当月营收记录的参数为updateMonthTurnoverTo-{}", updateMonthTurnoverTo);
         if (repRevenueMonthlyMapper.updateMonthTurnover(updateMonthTurnoverTo) != 1) {
             throw new RuntimeException("更新当月营收记录失败");
@@ -246,6 +284,12 @@ public class RepRevenueDailySvcImpl extends
         updateYearTurnoverTo.setNewOrderNumber(annualResult.getOrderNumber() + 1);
         updateYearTurnoverTo.setNewCost(annualResult.getCost().add(costTitle));
         updateYearTurnoverTo.setNewProfit(annualResult.getProfit().add(profitTitle));
+
+        updateYearTurnoverTo.setCash(annualResult.getCash().add(cash));
+        updateYearTurnoverTo.setWxpay(annualResult.getWxpay().add(wxpay));
+        updateYearTurnoverTo.setAlipay(annualResult.getAlipay().add(alipay));
+        updateYearTurnoverTo.setCashback(annualResult.getCashback().add(cashback));
+
         log.info("更新年营收记录的参数为updateYearTurnoverTo-{}", updateYearTurnoverTo);
         if (repRevenueAnnualMapper.updateYearTurnover(updateYearTurnoverTo) != 1) {
             throw new RuntimeException("更新当年营收记录失败");
@@ -320,8 +364,46 @@ public class RepRevenueDailySvcImpl extends
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public Ro returnTurnover(ReturnTurnoverTo returnTurnoverTo) {
         Ro result = new Ro();
-        // 将营收改为负数
-        returnTurnoverTo.setRealMoney(returnTurnoverTo.getRealMoney().multiply(new BigDecimal("-1")));
+        // 获取订单来获取订单详情
+        BigDecimal costTitle = BigDecimal.ZERO;
+        OrdOrderMo orderResult = ordOrderSvc.getById(returnTurnoverTo.getOrderId());
+        log.info("根据订单id获取到的订单结果为-{}", orderResult);
+        if (orderResult == null) {
+            throw new RuntimeException("订单不存在");
+        }
+        // 初始化各个支付类型本次应该增加的金额
+        BigDecimal cash = BigDecimal.ZERO;
+        BigDecimal wxpay = BigDecimal.ZERO;
+        BigDecimal alipay = BigDecimal.ZERO;
+        BigDecimal cashback = BigDecimal.ZERO;
+        switch (orderResult.getPayWay()) {
+        case 1:
+            cash = orderResult.getRealMoney();
+            break;
+        case 2:
+            wxpay = orderResult.getRealMoney();
+            break;
+        case 3:
+            alipay = orderResult.getRealMoney();
+            break;
+        case 4:
+            cashback = orderResult.getRealMoney();
+            break;
+        }
+
+        // 获取订单详情计算成本和利润
+        List<OrdOrderDetailMo> orderDetailList = ordOrderDetailSvc.listAll(orderResult.getId());
+        log.info("根据订单id获取到的订单详情结果为-{}", orderDetailList);
+        if (orderDetailList.size() < 1) {
+            throw new RuntimeException("订单详情不存在");
+        }
+        for (final OrdOrderDetailMo orderDetail : orderDetailList) {
+            costTitle = costTitle.add(orderDetail.getCostPrice().multiply(orderDetail.getBuyCount()));
+        }
+
+        // 计算利润
+        BigDecimal profitTitle = returnTurnoverTo.getRealMoney().subtract(costTitle);
+        log.info("当前交易的金额明细为{}(总金额)-{}(总成本)={}(总利润)", returnTurnoverTo.getRealMoney(), costTitle, profitTitle);
 
         // 更新营收记录
         Calendar ca = Calendar.getInstance();
@@ -338,11 +420,17 @@ public class RepRevenueDailySvcImpl extends
         UpdateTurnoverTo updateDayTurnoverTo = new UpdateTurnoverTo();
         updateDayTurnoverTo.setId(dailyResult.getId());
         updateDayTurnoverTo.setModifiedTimestamp(new Date().getTime());
-        updateDayTurnoverTo.setNewTurnover(dailyResult.getTurnover().add(returnTurnoverTo.getRealMoney()));
+        updateDayTurnoverTo.setNewTurnover(dailyResult.getTurnover().subtract(returnTurnoverTo.getRealMoney()));
         updateDayTurnoverTo.setOldTurnover(dailyResult.getTurnover());
         updateDayTurnoverTo.setNewOrderNumber(dailyResult.getOrderNumber() - 1);
-        updateDayTurnoverTo.setNewCost(dailyResult.getCost().add(returnTurnoverTo.getRealMoney()));
-        updateDayTurnoverTo.setNewProfit(dailyResult.getProfit().add(returnTurnoverTo.getRealMoney()));
+        updateDayTurnoverTo.setNewCost(dailyResult.getCost().subtract(costTitle));
+        updateDayTurnoverTo.setNewProfit(dailyResult.getProfit().subtract(profitTitle));
+
+        updateDayTurnoverTo.setCash(dailyResult.getCash().subtract(cash));
+        updateDayTurnoverTo.setWxpay(dailyResult.getWxpay().subtract(wxpay));
+        updateDayTurnoverTo.setAlipay(dailyResult.getAlipay().subtract(alipay));
+        updateDayTurnoverTo.setCashback(dailyResult.getCashback().subtract(cashback));
+
         log.info("更新当天营收记录的参数为updateDayTurnoverTo-{}", updateDayTurnoverTo);
         if (_mapper.updateDayTurnover(updateDayTurnoverTo) != 1) {
             throw new RuntimeException("更新当天营收记录失败");
@@ -365,11 +453,17 @@ public class RepRevenueDailySvcImpl extends
         UpdateTurnoverTo updateWeekTurnoverTo = new UpdateTurnoverTo();
         updateWeekTurnoverTo.setId(weeklyResult.getId());
         updateWeekTurnoverTo.setModifiedTimestamp(new Date().getTime());
-        updateWeekTurnoverTo.setNewTurnover(weeklyResult.getTurnover().add(returnTurnoverTo.getRealMoney()));
+        updateWeekTurnoverTo.setNewTurnover(weeklyResult.getTurnover().subtract(returnTurnoverTo.getRealMoney()));
         updateWeekTurnoverTo.setOldTurnover(weeklyResult.getTurnover());
         updateWeekTurnoverTo.setNewOrderNumber(weeklyResult.getOrderNumber() - 1);
-        updateWeekTurnoverTo.setNewCost(weeklyResult.getCost().add(returnTurnoverTo.getRealMoney()));
-        updateWeekTurnoverTo.setNewProfit(weeklyResult.getProfit().add(returnTurnoverTo.getRealMoney()));
+        updateWeekTurnoverTo.setNewCost(weeklyResult.getCost().subtract(costTitle));
+        updateWeekTurnoverTo.setNewProfit(weeklyResult.getProfit().subtract(profitTitle));
+
+        updateWeekTurnoverTo.setCash(weeklyResult.getCash().subtract(cash));
+        updateWeekTurnoverTo.setWxpay(weeklyResult.getWxpay().subtract(wxpay));
+        updateWeekTurnoverTo.setAlipay(weeklyResult.getAlipay().subtract(alipay));
+        updateWeekTurnoverTo.setCashback(weeklyResult.getCashback().subtract(cashback));
+
         log.info("更新当周营收记录的参数为updateWeekTurnoverTo-{}", updateWeekTurnoverTo);
         if (repRevenueWeeklyMapper.updateWeekTurnover(updateWeekTurnoverTo) != 1) {
             throw new RuntimeException("更新当周营收记录失败");
@@ -388,11 +482,17 @@ public class RepRevenueDailySvcImpl extends
         UpdateTurnoverTo updateMonthTurnoverTo = new UpdateTurnoverTo();
         updateMonthTurnoverTo.setId(monthlyResult.getId());
         updateMonthTurnoverTo.setModifiedTimestamp(new Date().getTime());
-        updateMonthTurnoverTo.setNewTurnover(monthlyResult.getTurnover().add(returnTurnoverTo.getRealMoney()));
+        updateMonthTurnoverTo.setNewTurnover(monthlyResult.getTurnover().subtract(returnTurnoverTo.getRealMoney()));
         updateMonthTurnoverTo.setOldTurnover(monthlyResult.getTurnover());
         updateMonthTurnoverTo.setNewOrderNumber(monthlyResult.getOrderNumber() - 1);
-        updateMonthTurnoverTo.setNewCost(monthlyResult.getCost().add(returnTurnoverTo.getRealMoney()));
-        updateMonthTurnoverTo.setNewProfit(monthlyResult.getProfit().add(returnTurnoverTo.getRealMoney()));
+        updateMonthTurnoverTo.setNewCost(monthlyResult.getCost().subtract(costTitle));
+        updateMonthTurnoverTo.setNewProfit(monthlyResult.getProfit().subtract(profitTitle));
+
+        updateMonthTurnoverTo.setCash(monthlyResult.getCash().subtract(cash));
+        updateMonthTurnoverTo.setWxpay(monthlyResult.getWxpay().subtract(wxpay));
+        updateMonthTurnoverTo.setAlipay(monthlyResult.getAlipay().subtract(alipay));
+        updateMonthTurnoverTo.setCashback(monthlyResult.getCashback().subtract(cashback));
+
         log.info("更新当月营收记录的参数为updateMonthTurnoverTo-{}", updateMonthTurnoverTo);
         if (repRevenueMonthlyMapper.updateMonthTurnover(updateMonthTurnoverTo) != 1) {
             throw new RuntimeException("更新当月营收记录失败");
@@ -410,11 +510,17 @@ public class RepRevenueDailySvcImpl extends
         UpdateTurnoverTo updateYearTurnoverTo = new UpdateTurnoverTo();
         updateYearTurnoverTo.setId(annualResult.getId());
         updateYearTurnoverTo.setModifiedTimestamp(new Date().getTime());
-        updateYearTurnoverTo.setNewTurnover(annualResult.getTurnover().add(returnTurnoverTo.getRealMoney()));
+        updateYearTurnoverTo.setNewTurnover(annualResult.getTurnover().subtract(returnTurnoverTo.getRealMoney()));
         updateYearTurnoverTo.setOldTurnover(annualResult.getTurnover());
         updateYearTurnoverTo.setNewOrderNumber(annualResult.getOrderNumber() - 1);
-        updateYearTurnoverTo.setNewCost(annualResult.getCost().add(returnTurnoverTo.getRealMoney()));
-        updateYearTurnoverTo.setNewProfit(annualResult.getProfit().add(returnTurnoverTo.getRealMoney()));
+        updateYearTurnoverTo.setNewCost(annualResult.getCost().subtract(costTitle));
+        updateYearTurnoverTo.setNewProfit(annualResult.getProfit().subtract(profitTitle));
+
+        updateYearTurnoverTo.setCash(annualResult.getCash().subtract(cash));
+        updateYearTurnoverTo.setWxpay(annualResult.getWxpay().subtract(wxpay));
+        updateYearTurnoverTo.setAlipay(annualResult.getAlipay().subtract(alipay));
+        updateYearTurnoverTo.setCashback(annualResult.getCashback().subtract(cashback));
+
         log.info("更新年营收记录的参数为updateYearTurnoverTo-{}", updateYearTurnoverTo);
         if (repRevenueAnnualMapper.updateYearTurnover(updateYearTurnoverTo) != 1) {
             throw new RuntimeException("更新当年营收记录失败");

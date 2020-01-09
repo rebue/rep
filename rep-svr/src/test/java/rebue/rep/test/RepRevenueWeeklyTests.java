@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.expression.ParseException;
-
 import rebue.rep.mo.RepRevenueWeeklyMo;
 import rebue.robotech.dic.ResultDic;
 import rebue.robotech.ro.IdRo;
@@ -36,12 +34,7 @@ public class RepRevenueWeeklyTests {
      */
     private final ObjectMapper _objectMapper = new ObjectMapper();
 
-    /**
-     * 测试基本的增删改查
-     *
-     * @mbg.generated 自动生成，如需修改，请删除本行
-     */
-  //  @Test
+    // @Test
     public void testCrud() throws IOException, ReflectiveOperationException {
         RepRevenueWeeklyMo mo = null;
         for (int i = 0; i < 20; i++) {
@@ -73,15 +66,13 @@ public class RepRevenueWeeklyTests {
         log.info(deleteRo.toString());
         Assertions.assertEquals(ResultDic.SUCCESS, deleteRo.getResult());
     }
-    
-    
+
     @Test
     public void method_2() throws java.text.ParseException {
         // 创建Calendar对象
         Calendar calendar = Calendar.getInstance();
         // 定义输入时间的格式
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
         // 从键盘上获取时间
         String date = "2019-04-17";
         try {
@@ -94,7 +85,5 @@ public class RepRevenueWeeklyTests {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-
     }
 }

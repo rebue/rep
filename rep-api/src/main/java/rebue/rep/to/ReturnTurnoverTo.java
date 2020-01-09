@@ -9,15 +9,18 @@ import lombok.Data;
 
 /**
  * 退款后减去营收报表to
+ * 
  * @author jjl
  *
  */
 @Data
 @JsonInclude(Include.NON_NULL)
 public class ReturnTurnoverTo {
-    
-    
+
     private Long shopId;
-    
+
     private BigDecimal realMoney;
+
+    private Long orderId;
+
 }
