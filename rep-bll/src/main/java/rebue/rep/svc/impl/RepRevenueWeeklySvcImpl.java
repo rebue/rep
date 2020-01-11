@@ -77,6 +77,10 @@ public class RepRevenueWeeklySvcImpl extends
                     RepRevenueRo revenueRo = new RepRevenueRo();
                     revenueRo.setRevenueTime(year + "第" + item.getWeekOfYear() + "周");
                     revenueRo.setTotal(item.getTurnover());
+                    revenueRo.setCash(item.getCash());
+                    revenueRo.setWxpay(item.getWxpay());
+                    revenueRo.setAlipay(item.getAlipay());
+                    revenueRo.setCashback(item.getCashback());
                     result.add(revenueRo);
                 }
             } else {
@@ -92,6 +96,10 @@ public class RepRevenueWeeklySvcImpl extends
                     log.info(year - 1 + "第" + item.getWeekOfYear() + "周");
                     revenueRo.setRevenueTime(year - 1 + "第" + item.getWeekOfYear() + "周");
                     revenueRo.setTotal(item.getTurnover());
+                    revenueRo.setCash(item.getCash());
+                    revenueRo.setWxpay(item.getWxpay());
+                    revenueRo.setAlipay(item.getAlipay());
+                    revenueRo.setCashback(item.getCashback());
                     result.add(revenueRo);
                 }
                 // 查询选择年的
@@ -102,6 +110,10 @@ public class RepRevenueWeeklySvcImpl extends
                     log.info(year + "第" + item.getWeekOfYear() + "周");
                     revenueRo.setRevenueTime(year + "第" + item.getWeekOfYear() + "周");
                     revenueRo.setTotal(item.getTurnover());
+                    revenueRo.setCash(item.getCash());
+                    revenueRo.setWxpay(item.getWxpay());
+                    revenueRo.setAlipay(item.getAlipay());
+                    revenueRo.setCashback(item.getCashback());
                     result.add(revenueRo);
                 }
 

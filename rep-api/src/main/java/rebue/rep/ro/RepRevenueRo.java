@@ -20,5 +20,11 @@ public class RepRevenueRo {
      * 营收金额
      */
     private BigDecimal total;
+    
+    
+    private BigDecimal cash;
+    private BigDecimal wxpay;
+    private BigDecimal alipay;
+    private BigDecimal cashback;
 
 }

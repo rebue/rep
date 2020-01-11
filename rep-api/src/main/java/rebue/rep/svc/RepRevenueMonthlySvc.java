@@ -14,5 +14,5 @@ import rebue.robotech.svc.BaseSvc;
  */
 public interface RepRevenueMonthlySvc extends BaseSvc<java.lang.Long, RepRevenueMonthlyMo, RepRevenueMonthlyJo> {
 
-    List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime);
+    List<RepRevenueRo> listRevenueOfMonth(Long shopId, String revenueStartTime, String revenueEndTime);
 }

@@ -189,6 +189,10 @@ public class RepRevenueAnnualSvcImpl extends
                 log.info("营收时间为-{}", formatter.format(Date));
                 revenueRo.setRevenueTime(formatter.format(Date));
                 revenueRo.setTotal(item.getTurnover());
+                revenueRo.setCash(item.getCash());
+                revenueRo.setWxpay(item.getWxpay());
+                revenueRo.setAlipay(item.getAlipay());
+                revenueRo.setCashback(item.getCashback());
                 result.add(revenueRo);
                 calendarGetStartDay.add(Calendar.YEAR, 1);
             }

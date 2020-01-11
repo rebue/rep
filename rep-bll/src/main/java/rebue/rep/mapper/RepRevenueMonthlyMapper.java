@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import rebue.rep.mo.RepRevenueDailyMo;
 import rebue.rep.mo.RepRevenueMonthlyMo;
 import rebue.rep.to.UpdateTurnoverTo;
 import rebue.robotech.mapper.MybatisBaseMapper;
@@ -71,7 +70,7 @@ public interface RepRevenueMonthlyMapper extends MybatisBaseMapper<RepRevenueMon
     int updateMonthTurnover(UpdateTurnoverTo to);
 
     
-    @Select("select * from REP_REVENUE_MONTHLY where  SHOP_ID  = #{shopId,jdbcType=TINYINT} and (YEAR =  #{revenueStartYear}  and MONTH_OF_YEAR >= #{revenueStartMonth} ) or ( YEAR =  #{revenueEndYear}  and MONTH_OF_YEAR <=  #{revenueEndMonth} )  order by YEAR ,MONTH_OF_YEAR  ")
+    @Select("select * from REP_REVENUE_MONTHLY where  SHOP_ID  = #{shopId,jdbcType=TINYINT} and ( (YEAR =  #{revenueStartYear}  and MONTH_OF_YEAR >= #{revenueStartMonth} ) or ( YEAR =  #{revenueEndYear}  and MONTH_OF_YEAR <=  #{revenueEndMonth} ) ) order by YEAR ,MONTH_OF_YEAR  ")
     List<RepRevenueMonthlyMo> selectRevenueOfMonth1(@Param("shopId") Long shopId,  @Param("revenueStartYear") int revenueStartYear,@Param("revenueStartMonth") int revenueStartMonth,
             @Param("revenueEndYear")   int revenueEndYear, @Param("revenueEndMonth") int revenueEndMonth);
 

@@ -57,7 +57,7 @@ public class RepRevenueMonthlySvcImpl extends
     }
 
     @Override
-    public List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime) {
+    public List<RepRevenueRo> listRevenueOfMonth(Long shopId, String revenueStartTime, String revenueEndTime) {
         List<RepRevenueRo> result = new ArrayList<RepRevenueRo>();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         try {
@@ -91,6 +91,10 @@ public class RepRevenueMonthlySvcImpl extends
                 log.info("营收时间为-{}", formatter.format(Date));
                 revenueRo.setRevenueTime(formatter.format(Date));
                 revenueRo.setTotal(item.getTurnover());
+                revenueRo.setCash(item.getCash());
+                revenueRo.setWxpay(item.getWxpay());
+                revenueRo.setAlipay(item.getAlipay());
+                revenueRo.setCashback(item.getCashback());
                 result.add(revenueRo);
                 calendarGetStartDay.add(Calendar.MONTH, 1);
             }

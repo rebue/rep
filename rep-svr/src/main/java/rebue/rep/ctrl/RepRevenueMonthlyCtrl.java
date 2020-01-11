@@ -178,6 +178,6 @@ public class RepRevenueMonthlyCtrl {
     List<RepRevenueRo> listRevenueOfMonth(@RequestParam("shopId") final java.lang.Long shopId,
             @RequestParam("revenueStartTime") final java.lang.String revenueStartTime, @RequestParam("revenueEndTime") final java.lang.String revenueEndTime) {
         log.info("根据店铺id和时间查询统计月报参数为shopId-{},-{},-{}", shopId, revenueStartTime,revenueEndTime);
-        return svc.listRevenueOfDay(shopId, revenueStartTime,revenueEndTime);
+        return svc.listRevenueOfMonth(shopId, revenueStartTime,revenueEndTime);
     }
 }
