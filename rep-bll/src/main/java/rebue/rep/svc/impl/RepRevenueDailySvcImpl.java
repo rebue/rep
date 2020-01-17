@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import rebue.afc.dic.PayAndRefundTypeDic;
 import rebue.afc.msg.PayDoneMsg;
 import rebue.ord.mo.OrdOrderDetailMo;
 import rebue.ord.mo.OrdOrderMo;
@@ -134,6 +135,11 @@ public class RepRevenueDailySvcImpl extends
         if (orderList.get(0).getShopId() == null) {
             log.info("店铺id为空，是线上商品，不需要记录营收-shopId{}", orderList.get(0).getShopId());
             return null;
+        }
+        if (payDoneMsg.getPayType() == PayAndRefundTypeDic.VPAY) {
+            // 订单同时收到支付完成通知并去修改支付类型，但可能没修改完成这边就查询出来造成还是原来的支付方式
+            // 所以这边手动修改为返现金支付(v支付)
+            orderList.get(0).setPayWay((byte) 4);
         }
 
         // 初始化各个支付类型本次应该增加的金额
@@ -350,7 +356,7 @@ public class RepRevenueDailySvcImpl extends
                 revenueRo.setWxpay(item.getWxpay());
                 revenueRo.setAlipay(item.getAlipay());
                 revenueRo.setCashback(item.getCashback());
-                
+
                 result.add(revenueRo);
                 calendarGetStartDay.add(Calendar.DAY_OF_YEAR, 1);
             }
