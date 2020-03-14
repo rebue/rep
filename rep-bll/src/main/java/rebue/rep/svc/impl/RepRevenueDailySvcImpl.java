@@ -114,14 +114,14 @@ public class RepRevenueDailySvcImpl extends
      */
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-    public Void handlePayNotify(PayDoneMsg payDoneMsg) {
+    public void handlePayNotify(PayDoneMsg payDoneMsg) {
         log.info("收到支付完成通知-{}", payDoneMsg);
         RepRevenueOrderMo getOnlmo = new RepRevenueOrderMo();
         getOnlmo.setOrderId(Long.valueOf(payDoneMsg.getOrderId()));
         getOnlmo.setType((byte) 1);
         log.info("获取是否已经添加过的参数为getOnlmo-{}", getOnlmo);
         if (repRevenueOrderSvc.getOne(getOnlmo) != null) {
-            return null;
+            return ;
         }
 
         // 获取订单来获取订单详情
@@ -134,7 +134,7 @@ public class RepRevenueDailySvcImpl extends
         }
         if (orderList.get(0).getShopId() == null) {
             log.info("店铺id为空，是线上商品，不需要记录营收-shopId{}", orderList.get(0).getShopId());
-            return null;
+            return ;
         }
         if (payDoneMsg.getPayType() == PayAndRefundTypeDic.VPAY) {
             // 订单同时收到支付完成通知并去修改支付类型，但可能没修改完成这边就查询出来造成还是原来的支付方式
@@ -308,7 +308,7 @@ public class RepRevenueDailySvcImpl extends
         if (repRevenueOrderSvc.add(revanueOrder) != 1) {
             throw new RuntimeException("添加订单记录失败");
         }
-        return null;
+        return ;
     }
 
     @Override
@@ -536,6 +536,18 @@ public class RepRevenueDailySvcImpl extends
         if (repRevenueAnnualMapper.updateYearTurnover(updateYearTurnoverTo) != 1) {
             throw new RuntimeException("更新当年营收记录失败");
         }
+        
+        
+        // 删除该条营收订单记录
+        OrdOrderMo  ordOrderMo= ordOrderSvc.getById(returnTurnoverTo.getOrderId());
+        RepRevenueOrderMo getRevanueOrder = new RepRevenueOrderMo();
+        getRevanueOrder.setOrderId(ordOrderMo.getPayOrderId());
+        getRevanueOrder.setType((byte) 1);
+        RepRevenueOrderMo getRevanueResult = repRevenueOrderSvc.getOne(getRevanueOrder);
+        if (getRevanueResult == null || repRevenueOrderSvc.del(getRevanueResult.getId()) != 1) {
+            throw new RuntimeException("添加订单记录失败");
+        }
+        
         result.setMsg("更新营收记录成功");
         result.setResult(ResultDic.SUCCESS);
         return result;

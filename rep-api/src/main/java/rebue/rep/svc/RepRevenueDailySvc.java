@@ -17,7 +17,7 @@ import rebue.robotech.svc.BaseSvc;
  */
 public interface RepRevenueDailySvc extends BaseSvc<java.lang.Long, RepRevenueDailyMo, RepRevenueDailyJo> {
 
-    Void handlePayNotify(PayDoneMsg payDoneMsg);
+    void handlePayNotify(PayDoneMsg payDoneMsg);
 
 
     List<RepRevenueRo> listRevenueOfDay(Long shopId, String revenueStartTime, String revenueEndTime);
